@@ -651,7 +651,7 @@ const cursor=document.getElementById('cursor'),ring=document.getElementById('cur
 let mx=0,my=0,rx=0,ry=0;
 document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cursor.style.left=mx+'px';cursor.style.top=my+'px'});
 function animRing(){rx+=(mx-rx)*0.12;ry+=(my-ry)*0.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(animRing)}animRing();
-document.querySelectorAll('a,button,[data-tilt],.work-card,.approach-card,.stat-card,.stack-badge').forEach(el=>{el.addEventListener('mouseenter',()=>document.body.classList.add('cursor-grow'));el.addEventListener('mouseleave',()=>document.body.classList.remove('cursor-grow'))});
+// cursor-grow handled in wireCards()
 const canvas=document.getElementById('particles'),ctx=canvas.getContext('2d');let W,H,particles=[];
 function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight}resize();window.addEventListener('resize',resize);
 class Particle{constructor(){this.reset()}reset(){this.x=Math.random()*W;this.y=Math.random()*H;this.vx=(Math.random()-0.5)*0.3;this.vy=-Math.random()*0.5-0.1;this.size=Math.random()*2+0.5;this.alpha=Math.random()*0.4+0.1;this.life=0;this.maxLife=Math.random()*300+200}update(){this.x+=this.vx;this.y+=this.vy;this.life++;if(this.life>this.maxLife||this.y<-10)this.reset()}draw(){const prog=this.life/this.maxLife;const a=this.alpha*(prog<0.1?prog/0.1:prog>0.9?(1-prog)/0.1:1);ctx.save();ctx.globalAlpha=a;ctx.fillStyle=Math.random()>0.7?'#FFD166':'#C9A84C';ctx.beginPath();ctx.arc(this.x,this.y,this.size,0,Math.PI*2);ctx.fill();ctx.restore()}}
@@ -662,7 +662,36 @@ document.querySelectorAll('.reveal,.reveal-left,.reveal-right').forEach(el=>obse
 const sections=document.querySelectorAll('section[id]'),navLinks=document.querySelectorAll('nav a');
 const navObserver=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){navLinks.forEach(a=>a.classList.remove('active'));const active=document.querySelector('nav a[href="#'+e.target.id+'"]');if(active)active.classList.add('active')}})},{threshold:0.5});
 sections.forEach(s=>navObserver.observe(s));
-document.querySelectorAll('[data-tilt]').forEach(card=>{card.addEventListener('mousemove',e=>{const rect=card.getBoundingClientRect();const cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;const dx=(e.clientX-cx)/(rect.width/2),dy=(e.clientY-cy)/(rect.height/2);card.style.transform='perspective(800px) rotateX('+(- dy*6)+'deg) rotateY('+(dx*6)+'deg) translateY(-8px)'});card.addEventListener('mouseleave',()=>{card.style.transform='';card.style.transition='transform 0.5s cubic-bezier(0.16,1,0.3,1)'});card.addEventListener('mouseenter',()=>{card.style.transition='transform 0.1s ease'})});
+// ── WIRE CARDS — called on load + after Firebase rebuilds ──
+window.wireCards = function(){
+  // tilt
+  document.querySelectorAll('[data-tilt]').forEach(card=>{
+    if(card._wired) return; card._wired=true;
+    card.addEventListener('mousemove',e=>{const rect=card.getBoundingClientRect();const cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;const dx=(e.clientX-cx)/(rect.width/2),dy=(e.clientY-cy)/(rect.height/2);card.style.transform='perspective(800px) rotateX('+(- dy*6)+'deg) rotateY('+(dx*6)+'deg) translateY(-8px)'});
+    card.addEventListener('mouseleave',()=>{card.style.transform='';card.style.transition='transform 0.5s cubic-bezier(0.16,1,0.3,1)'});
+    card.addEventListener('mouseenter',()=>{card.style.transition='transform 0.1s ease'});
+  });
+  // cursor grow on all interactive elements
+  document.querySelectorAll('a,button,[data-tilt],.work-card,.approach-card,.stat-card,.stack-badge').forEach(el=>{
+    if(el._cursorWired) return; el._cursorWired=true;
+    el.addEventListener('mouseenter',()=>document.body.classList.add('cursor-grow'));
+    el.addEventListener('mouseleave',()=>document.body.classList.remove('cursor-grow'));
+  });
+  // popup triggers
+  document.querySelectorAll('.popup-trigger').forEach(link=>{
+    if(link._popupWired) return; link._popupWired=true;
+    link.addEventListener('click',e=>{
+      e.preventDefault();
+      if(window.openPopup) window.openPopup(link.dataset.title||'Project', link.dataset.tag||'', link.dataset.url||'');
+    });
+  });
+  // stack badge magnetic + reveal
+  document.querySelectorAll('.stack-badge,.work-card,.approach-card').forEach(el=>{
+    if(el._revealWired) return; el._revealWired=true;
+    observer.observe(el);
+  });
+};
+wireCards();
 window.addEventListener('mousemove',e=>{const x=(e.clientX/window.innerWidth-0.5)*20,y=(e.clientY/window.innerHeight-0.5)*20;document.querySelector('.orb-1').style.transform='translate('+(x*0.8)+'px,'+(y*0.8)+'px)';document.querySelector('.orb-2').style.transform='translate('+(-x*0.5)+'px,'+(-y*0.5)+'px)';document.querySelector('.orb-3').style.transform='translate('+(x*0.3)+'px,'+(y*0.3)+'px)'});
 
 // ─── MAGNETIC VACUUM PULL ───
@@ -1001,26 +1030,8 @@ window.addEventListener('mousemove',e=>{const x=(e.clientX/window.innerWidth-0.5
               </a>
             </div>`;
           }).join('');
-          // re-observe new cards for reveal animation
-          document.querySelectorAll('.work-card.reveal').forEach(el => observer.observe(el));
-          // re-apply tilt
-          document.querySelectorAll('[data-tilt]').forEach(card => {
-            card.addEventListener('mousemove', e => {
-              const rect = card.getBoundingClientRect();
-              const cx = rect.left+rect.width/2, cy = rect.top+rect.height/2;
-              const dx = (e.clientX-cx)/(rect.width/2), dy = (e.clientY-cy)/(rect.height/2);
-              card.style.transform = `perspective(800px) rotateX(${-dy*6}deg) rotateY(${dx*6}deg) translateY(-8px)`;
-            });
-            card.addEventListener('mouseleave', () => { card.style.transform=''; card.style.transition='transform 0.5s cubic-bezier(0.16,1,0.3,1)'; });
-            card.addEventListener('mouseenter', () => { card.style.transition='transform 0.1s ease'; });
-          });
-          // re-wire popup triggers
-          document.querySelectorAll('.popup-trigger').forEach(link => {
-            link.addEventListener('click', e => {
-              e.preventDefault();
-              if (window.openPopup) window.openPopup(link.dataset.title, link.dataset.tag, link.dataset.url);
-            });
-          });
+          // re-wire all interactions after rebuild
+          setTimeout(() => { if(window.wireCards) window.wireCards(); }, 50);
         }
       }
 
@@ -1048,7 +1059,7 @@ window.addEventListener('mousemove',e=>{const x=(e.clientX/window.innerWidth-0.5
               <h3 class="approach-title">${a.title||''}</h3>
               <p class="approach-text">${a.text||''}</p>
             </div>`).join('');
-          document.querySelectorAll('.approach-card.reveal').forEach(el => observer.observe(el));
+          setTimeout(() => { if(window.wireCards) window.wireCards(); }, 50);
         }
       }
 
