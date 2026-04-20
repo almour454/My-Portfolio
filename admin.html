@@ -490,63 +490,6 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
 });
 
 
-// ── SEED — pre-fills all fields with current hardcoded site content ──
-document.getElementById('seedBtn').addEventListener('click', () => {
-  // HERO
-  document.getElementById('heroEyebrow').value   = 'Available for new projects';
-  document.getElementById('heroLine1').value      = 'I build things';
-  document.getElementById('heroLine2').value      = 'that <em>work.</em>';
-  document.getElementById('heroSub').value        = 'I build smart bots and websites that actually do something. AI where it makes sense — results always.';
-  document.getElementById('heroBtnPrimary').value = 'View Work';
-  document.getElementById('heroBtnGhost').value   = 'Get in touch';
-
-  // ABOUT
-  document.getElementById('aboutEN').value    = "I'm based in Iraq. I build things that actually work — websites, AI bots, automations. I focus on smart solutions over traditional ones.\nMy approach: figure out what you actually need, use AI where it genuinely helps, and deliver something real. No fluff.";
-  document.getElementById('aboutAR').value    = 'أعمل من قلب العراق. تخصصي هو بناء أنظمة برمجية تعمل على أرض الواقع — من بوتات الذكاء الاصطناعي إلى انظمة الأعمال. أركز على تقديم حلول ذكية تتجاوز الطرق التقليدية القديمة';
-  document.getElementById('stat1num').value   = '3+';
-  document.getElementById('stat1label').value = 'Projects Shipped';
-  document.getElementById('stat2num').value   = '1';
-  document.getElementById('stat2label').value = 'AI Bot Built';
-
-  // CONTACT
-  document.getElementById('contactTitle').value   = "Let's build something great";
-  document.getElementById('contactSub').value     = "Have a project in mind? A business that needs a bot, a website, or something smart built? Let's talk.";
-  document.getElementById('contactEmail').value   = 'almour10k@gmail.com';
-  document.getElementById('socialGithub').value   = 'https://github.com/almour454';
-  document.getElementById('socialLinkedin').value = 'https://www.linkedin.com/in/mour-allawandi-8b9472400/';
-  document.getElementById('socialWhatsapp').value = '+9647712343468';
-
-  // FOOTER
-  document.getElementById('footer').value = 'Built with obsession · Karbala, Iraq ·';
-
-  // PROJECTS
-  projects = [
-    { tag:'AI · WhatsApp Bot',  title:'Alamani Smart Bot',                    desc:'AI-powered WhatsApp sales bot for an electronics store in Karbala. Understands Iraqi Arabic dialect, budget filtering, and recommends products from a live inventory of 100+ categories.', url:'', status:'live' },
-    { tag:'Web · Full Stack',   title:'Restaurant Management - نظام مطعم دلفري POS', desc:'Describe your second project here. What problem did it solve? What makes it interesting? Keep it honest and direct.', url:'', status:'live' },
-    { tag:'Web · Full Stack',   title:'Barber Management / Dashboard',         desc:'Describe your third project here. What was the challenge? What did you learn? What result did it deliver?', url:'', status:'live' },
-    { tag:'Web · Design',       title:'RealEstate - العقار',                   desc:'Another project slot. Keep adding your work here. Each one should tell a short story about what it is and why it matters.', url:'', status:'live' },
-  ];
-  renderProjects();
-
-  // APPROACH
-  approaches = [
-    { icon:'🧠', title:'AI where it matters',    text:'I use AI to solve real problems — not to look impressive. If a simpler solution works better, I use that.' },
-    { icon:'🎯', title:'Built to work',           text:"Pretty is useless if it breaks. Everything I build is tested, reliable, and actually does what it's supposed to do." },
-    { icon:'⚡', title:'Direct communication',    text:"No corporate speak. I tell you what's possible, what's not, and how long it'll take. Honest, always." },
-  ];
-  renderApproach();
-
-  // BOTS
-  bots = [
-    { icon:'🛍️', name:'Alamani Smart Bot', desc:'بوت مبيعات واتساب · الاماني للإلكترونيات', url:'', badge:'live' },
-    { icon:'🤖', name:'Bot #2',            desc:'قريباً · المزيد من البوتات',               url:'', badge:'soon' },
-    { icon:'⚡', name:'Bot #3',            desc:'قريباً · المزيد من البوتات',               url:'', badge:'soon' },
-  ];
-  renderBots();
-
-  showToast('✅ All fields loaded — now hit Save & Publish!', false);
-});
-
 function showToast(msg, isErr) {
   const t = document.getElementById('toast');
   t.textContent = msg;
