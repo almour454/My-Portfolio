@@ -694,29 +694,26 @@ window.wireCards = function(){
 wireCards();
 window.addEventListener('mousemove',e=>{const x=(e.clientX/window.innerWidth-0.5)*20,y=(e.clientY/window.innerHeight-0.5)*20;document.querySelector('.orb-1').style.transform='translate('+(x*0.8)+'px,'+(y*0.8)+'px)';document.querySelector('.orb-2').style.transform='translate('+(-x*0.5)+'px,'+(-y*0.5)+'px)';document.querySelector('.orb-3').style.transform='translate('+(x*0.3)+'px,'+(y*0.3)+'px)'});
 
-// ─── MAGNETIC VACUUM PULL ───
+// ─── MAGNETIC VACUUM PULL — dynamic, picks up Firebase-rendered elements ───
 (function(){
   const RADIUS=120,MAX_PULL=10,FRICTION=0.75,SPRING=0.18;
-  const magnets=[];
-  document.querySelectorAll(".btn-primary,.btn-ghost,.social-pill,.stack-badge,.work-link").forEach(el=>{
-    magnets.push({el,vx:0,vy:0,ox:0,oy:0});
-  });
-  if(!magnets.length)return;
+  const state=new Map(); // el -> {vx,vy,ox,oy}
   let px=9999,py=9999;
   window.addEventListener("mousemove",e=>{px=e.clientX;py=e.clientY});
   window.addEventListener("touchmove",e=>{const t=e.touches[0];px=t.clientX;py=t.clientY},{passive:true});
   window.addEventListener("touchend",()=>{px=9999;py=9999});
   function tick(){
-    magnets.forEach(m=>{
-      const r=m.el.getBoundingClientRect();
+    // query fresh every frame so Firebase-added elements are included
+    document.querySelectorAll(".btn-primary,.btn-ghost,.social-pill,.stack-badge,.work-link").forEach(el=>{
+      if(!state.has(el)) state.set(el,{vx:0,vy:0,ox:0,oy:0});
+      const m=state.get(el);
+      const r=el.getBoundingClientRect();
       const cx=r.left+r.width/2,cy=r.top+r.height/2;
       const dx=px-cx,dy=py-cy;
       const dist=Math.sqrt(dx*dx+dy*dy);
       let tx=0,ty=0;
       if(dist<RADIUS&&dist>0){
         const strength=Math.pow(1-dist/RADIUS,2);
-        tx=Math.max(-MAX_PULL,Math.min(MAX_PULL,dx*strength*MAX_PULL/dist*dist/dist*dist));
-        ty=Math.max(-MAX_PULL,Math.min(MAX_PULL,dy*strength*MAX_PULL/dist*dist/dist*dist));
         tx=dx/dist*strength*MAX_PULL;
         ty=dy/dist*strength*MAX_PULL;
       }
@@ -725,7 +722,7 @@ window.addEventListener('mousemove',e=>{const x=(e.clientX/window.innerWidth-0.5
       m.vx*=FRICTION;m.vy*=FRICTION;
       m.ox+=m.vx;m.oy+=m.vy;
       if(Math.abs(m.ox)>0.05||Math.abs(m.oy)>0.05){
-        m.el.style.transform="translate("+m.ox.toFixed(2)+"px,"+m.oy.toFixed(2)+"px)";
+        el.style.transform="translate("+m.ox.toFixed(2)+"px,"+m.oy.toFixed(2)+"px)";
       }
     });
     requestAnimationFrame(tick);
@@ -1030,8 +1027,7 @@ window.addEventListener('mousemove',e=>{const x=(e.clientX/window.innerWidth-0.5
               </a>
             </div>`;
           }).join('');
-          // re-wire all interactions after rebuild
-          setTimeout(() => { if(window.wireCards) window.wireCards(); }, 50);
+
         }
       }
 
@@ -1059,7 +1055,7 @@ window.addEventListener('mousemove',e=>{const x=(e.clientX/window.innerWidth-0.5
               <h3 class="approach-title">${a.title||''}</h3>
               <p class="approach-text">${a.text||''}</p>
             </div>`).join('');
-          setTimeout(() => { if(window.wireCards) window.wireCards(); }, 50);
+
         }
       }
 
@@ -1113,6 +1109,9 @@ window.addEventListener('mousemove',e=>{const x=(e.clientX/window.innerWidth-0.5
     } catch(e) {
       console.warn('Firebase load failed:', e.message);
     }
+
+    // re-wire everything after all DOM changes are done
+    setTimeout(() => { if(window.wireCards) window.wireCards(); }, 100);
   }
 
   loadContent();
