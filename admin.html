@@ -7,439 +7,457 @@
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--gold:#C9A84C;--gold-dim:rgba(201,168,76,0.15);--bg:#060608;--bg2:#0d0d12;--card:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.08);--text:#F0EAD6;--text-dim:rgba(240,234,214,0.5);--green:#25d366;--red:#ff5f57}
-body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh;padding:0}
-
-/* ── LOGIN ── */
+:root{
+  --gold:#C9A84C;--gold-dim:rgba(201,168,76,0.15);--gold-glow:rgba(201,168,76,0.35);
+  --bg:#060608;--card:rgba(255,255,255,0.04);--card2:rgba(255,255,255,0.03);
+  --border:rgba(255,255,255,0.08);--text:#F0EAD6;--text-dim:rgba(240,234,214,0.5);
+  --green:#25d366;--red:#ff5f57;
+}
+body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh}
 #login-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999}
 .login-box{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:48px 40px;width:360px;text-align:center}
-.login-logo{font-size:32px;margin-bottom:12px}
+.login-logo{font-size:40px;margin-bottom:12px}
 .login-title{font-size:20px;font-weight:700;color:var(--gold);margin-bottom:6px}
 .login-sub{font-size:12px;color:var(--text-dim);margin-bottom:32px;letter-spacing:0.05em}
-.login-input{width:100%;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:10px;padding:12px 16px;color:var(--text);font-size:14px;font-family:'Syne',sans-serif;outline:none;margin-bottom:12px;transition:border-color 0.2s}
-.login-input:focus{border-color:var(--gold)}
-.login-btn{width:100%;background:linear-gradient(135deg,var(--gold),#a8882d);border:none;border-radius:10px;padding:13px;color:#0a0800;font-weight:700;font-size:14px;font-family:'Syne',sans-serif;cursor:pointer;transition:opacity 0.2s}
-.login-btn:hover{opacity:0.85}
-.login-error{color:var(--red);font-size:12px;margin-top:10px;display:none}
-
-/* ── LAYOUT ── */
+.google-btn{width:100%;background:#fff;border:none;border-radius:10px;padding:13px 20px;color:#333;font-weight:600;font-size:14px;font-family:'Syne',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:opacity 0.2s}
+.google-btn:hover{opacity:0.9}
+.login-error{color:var(--red);font-size:12px;margin-top:12px;display:none}
 #admin-app{display:none;min-height:100vh}
-.admin-header{background:rgba(255,255,255,0.03);border-bottom:1px solid var(--border);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(20px)}
+.admin-header{background:rgba(10,10,14,0.95);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(20px)}
 .admin-brand{display:flex;align-items:center;gap:12px}
-.admin-brand-icon{width:36px;height:36px;border-radius:10px;background:var(--gold-dim);border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:16px}
-.admin-brand-name{font-size:15px;font-weight:700;color:var(--text)}
+.admin-brand-icon{width:34px;height:34px;border-radius:9px;background:var(--gold-dim);border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:15px}
+.admin-brand-name{font-size:14px;font-weight:700;color:var(--text)}
 .admin-brand-sub{font-size:11px;color:var(--text-dim)}
-.header-actions{display:flex;align-items:center;gap:10px}
-.btn-save{background:linear-gradient(135deg,var(--gold),#a8882d);border:none;border-radius:10px;padding:10px 24px;color:#0a0800;font-weight:700;font-size:13px;font-family:'Syne',sans-serif;cursor:pointer;transition:opacity 0.2s;display:flex;align-items:center;gap:8px}
+.header-right{display:flex;align-items:center;gap:10px}
+.btn-save{background:linear-gradient(135deg,var(--gold),#a8882d);border:none;border-radius:9px;padding:9px 22px;color:#0a0800;font-weight:700;font-size:13px;font-family:'Syne',sans-serif;cursor:pointer;display:flex;align-items:center;gap:7px;transition:opacity 0.2s}
 .btn-save:hover{opacity:0.85}
 .btn-save:disabled{opacity:0.4;cursor:not-allowed}
-.btn-logout{background:transparent;border:1px solid var(--border);border-radius:10px;padding:10px 16px;color:var(--text-dim);font-size:12px;font-family:'Syne',sans-serif;cursor:pointer;transition:all 0.2s}
+.btn-logout{background:transparent;border:1px solid var(--border);border-radius:9px;padding:9px 14px;color:var(--text-dim);font-size:12px;font-family:'Syne',sans-serif;cursor:pointer;transition:all 0.2s}
 .btn-logout:hover{border-color:var(--red);color:var(--red)}
-.save-status{font-size:12px;color:var(--text-dim);opacity:0;transition:opacity 0.3s}
-.save-status.show{opacity:1}
-.save-status.ok{color:var(--green)}
-.save-status.err{color:var(--red)}
-
-/* ── CONTENT ── */
-.admin-body{max-width:900px;margin:0 auto;padding:40px 32px}
-.section-block{margin-bottom:40px}
-.section-head{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--border)}
-.section-icon{font-size:20px}
-.section-name{font-size:16px;font-weight:700;color:var(--text)}
-.section-desc{font-size:12px;color:var(--text-dim)}
-.fields-grid{display:grid;gap:16px}
-.field{display:flex;flex-direction:column;gap:6px}
-.field-label{font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);font-weight:600}
-.field-input{background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-size:14px;font-family:'Syne',sans-serif;outline:none;transition:border-color 0.2s;resize:none;line-height:1.5}
-.field-input:focus{border-color:var(--gold);background:rgba(255,255,255,0.07)}
+.user-pill{background:var(--card);border:1px solid var(--border);border-radius:100px;padding:5px 12px 5px 6px;display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text-dim)}
+.user-avatar{width:22px;height:22px;border-radius:50%;background:var(--gold-dim);border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:11px}
+.admin-layout{display:flex;min-height:calc(100vh - 57px)}
+.admin-sidebar{width:200px;flex-shrink:0;background:rgba(255,255,255,0.02);border-right:1px solid var(--border);padding:20px 0;position:sticky;top:57px;height:calc(100vh - 57px);overflow-y:auto}
+.sidebar-link{display:flex;align-items:center;gap:10px;padding:10px 20px;font-size:13px;color:var(--text-dim);cursor:pointer;transition:all 0.2s;border-left:2px solid transparent}
+.sidebar-link:hover{color:var(--text);background:rgba(255,255,255,0.03)}
+.sidebar-link.active{color:var(--gold);border-left-color:var(--gold);background:var(--gold-dim)}
+.sl-icon{font-size:16px;width:20px;text-align:center}
+.admin-content{flex:1;padding:36px 40px;max-width:820px}
+.section-block{margin-bottom:48px;display:none}
+.section-block.active{display:block}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;padding-bottom:14px;border-bottom:1px solid var(--border)}
+.section-head-left{display:flex;align-items:center;gap:12px}
+.section-icon{font-size:22px}
+.section-name{font-size:17px;font-weight:700;color:var(--text)}
+.section-desc{font-size:12px;color:var(--text-dim);margin-top:2px}
+.fields-grid{display:grid;gap:14px}
 .two-col{grid-template-columns:1fr 1fr}
 .three-col{grid-template-columns:1fr 1fr 1fr}
-.project-block{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:14px}
-.project-num{font-size:11px;letter-spacing:0.1em;color:var(--gold);font-weight:700;margin-bottom:14px;text-transform:uppercase}
-.toast{position:fixed;bottom:32px;right:32px;background:rgba(37,211,102,0.15);border:1px solid rgba(37,211,102,0.3);color:var(--green);padding:12px 20px;border-radius:12px;font-size:13px;font-family:'Syne',sans-serif;transform:translateY(20px);opacity:0;transition:all 0.3s;pointer-events:none;z-index:9999}
+.field{display:flex;flex-direction:column;gap:6px}
+.field-label{font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);font-weight:600}
+.field-input{background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:9px;padding:11px 13px;color:var(--text);font-size:13px;font-family:'Syne',sans-serif;outline:none;transition:border-color 0.2s;resize:vertical;line-height:1.5;width:100%}
+.field-input:focus{border-color:var(--gold);background:rgba(255,255,255,0.07)}
+.item-card{background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:14px}
+.item-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.item-card-num{font-size:11px;letter-spacing:0.1em;color:var(--gold);font-weight:700;text-transform:uppercase}
+.item-card-actions{display:flex;gap:8px}
+.btn-icon{background:transparent;border:1px solid var(--border);border-radius:7px;padding:5px 10px;color:var(--text-dim);font-size:12px;cursor:pointer;font-family:'Syne',sans-serif;transition:all 0.2s}
+.btn-icon:hover{border-color:rgba(255,95,87,0.5);color:var(--red)}
+.btn-del{border-color:rgba(255,95,87,0.3);color:var(--red)}
+.btn-add{background:var(--gold-dim);border:1px solid var(--gold-glow);border-radius:10px;padding:11px 20px;color:var(--gold);font-size:13px;font-family:'Syne',sans-serif;cursor:pointer;width:100%;margin-top:4px;transition:all 0.2s;font-weight:600}
+.btn-add:hover{background:rgba(201,168,76,0.2)}
+.toast{position:fixed;bottom:28px;right:28px;background:rgba(37,211,102,0.15);border:1px solid rgba(37,211,102,0.3);color:var(--green);padding:12px 20px;border-radius:12px;font-size:13px;font-family:'Syne',sans-serif;transform:translateY(20px);opacity:0;transition:all 0.3s;pointer-events:none;z-index:9999}
 .toast.show{transform:translateY(0);opacity:1}
 .toast.err{background:rgba(255,95,87,0.15);border-color:rgba(255,95,87,0.3);color:var(--red)}
-@media(max-width:600px){.two-col,.three-col{grid-template-columns:1fr}.admin-body{padding:24px 16px}.admin-header{padding:12px 16px}}
+@media(max-width:700px){.admin-sidebar{display:none}.admin-content{padding:20px 16px}.two-col,.three-col{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
 <div id="login-screen">
   <div class="login-box">
-    <div class="login-logo">🔐</div>
+    <div class="login-logo">⚡</div>
     <div class="login-title">Portfolio Admin</div>
-    <div class="login-sub">PRIVATE — مرتضى only</div>
-    <input class="login-input" id="loginPass" type="password" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()"/>
-    <button class="login-btn" onclick="doLogin()">Enter</button>
-    <div class="login-error" id="loginError">Wrong password</div>
+    <div class="login-sub">PRIVATE · مرتضى only</div>
+    <button class="google-btn" id="googleLoginBtn">
+      <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Sign in with Google
+    </button>
+    <div class="login-error" id="loginError">⛔ Access denied — not your account</div>
   </div>
 </div>
 
-<!-- ADMIN APP -->
 <div id="admin-app">
   <div class="admin-header">
     <div class="admin-brand">
       <div class="admin-brand-icon">⚡</div>
       <div>
         <div class="admin-brand-name">Portfolio Admin</div>
-        <div class="admin-brand-sub">Logged in as: <span id="adminUserName"></span></div>
+        <div class="admin-brand-sub">Changes go live instantly</div>
       </div>
     </div>
-    <div class="header-actions">
-      <span class="save-status" id="saveStatus"></span>
-      <button class="btn-save" id="saveBtn" onclick="saveAll()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-        Save & Publish
+    <div class="header-right">
+      <div class="user-pill"><div class="user-avatar">👤</div><span id="adminUserName"></span></div>
+      <button class="btn-save" id="saveBtn">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Save &amp; Publish
       </button>
-      <button class="btn-logout" onclick="logout()">Logout</button>
+      <button class="btn-logout" id="logoutBtn">Logout</button>
     </div>
   </div>
 
-  <div class="admin-body">
-
-    <!-- HERO -->
-    <div class="section-block">
-      <div class="section-head">
-        <span class="section-icon">🦸</span>
-        <div>
-          <div class="section-name">Hero Section</div>
-          <div class="section-desc">Top of the page — first thing visitors see</div>
-        </div>
-      </div>
-      <div class="fields-grid">
-        <div class="field">
-          <div class="field-label">Eyebrow Tag (small text above title)</div>
-          <input class="field-input" id="heroEyebrow" type="text" placeholder="Available for new projects"/>
-        </div>
-        <div class="fields-grid two-col">
-          <div class="field">
-            <div class="field-label">Title Line 1</div>
-            <input class="field-input" id="heroLine1" type="text" placeholder="I build things"/>
-          </div>
-          <div class="field">
-            <div class="field-label">Title Line 2</div>
-            <input class="field-input" id="heroLine2" type="text" placeholder="that &lt;em&gt;work.&lt;/em&gt;"/>
-          </div>
-        </div>
-        <div class="field">
-          <div class="field-label">Subtitle paragraph</div>
-          <textarea class="field-input" id="heroSub" rows="2" placeholder="I build smart bots and websites..."></textarea>
-        </div>
-      </div>
+  <div class="admin-layout">
+    <div class="admin-sidebar">
+      <div class="sidebar-link active" data-section="hero"><span class="sl-icon">🦸</span> Hero</div>
+      <div class="sidebar-link" data-section="work"><span class="sl-icon">💼</span> Work</div>
+      <div class="sidebar-link" data-section="about"><span class="sl-icon">👤</span> About</div>
+      <div class="sidebar-link" data-section="approach"><span class="sl-icon">🧠</span> Approach</div>
+      <div class="sidebar-link" data-section="bots"><span class="sl-icon">🤖</span> Bots Panel</div>
+      <div class="sidebar-link" data-section="contact"><span class="sl-icon">📬</span> Contact</div>
+      <div class="sidebar-link" data-section="footer"><span class="sl-icon">🔻</span> Footer</div>
     </div>
 
-    <!-- WORK CARDS -->
-    <div class="section-block">
-      <div class="section-head">
-        <span class="section-icon">💼</span>
-        <div>
-          <div class="section-name">Work / Projects</div>
-          <div class="section-desc">The 4 project cards in the Work section</div>
-        </div>
-      </div>
-      <div id="projectsWrap">
-        <!-- generated by JS -->
-      </div>
-    </div>
+    <div class="admin-content">
 
-    <!-- ABOUT -->
-    <div class="section-block">
-      <div class="section-head">
-        <span class="section-icon">👤</span>
-        <div>
-          <div class="section-name">About Section</div>
-          <div class="section-desc">Your bio — English and Arabic</div>
-        </div>
-      </div>
-      <div class="fields-grid">
-        <div class="field">
-          <div class="field-label">English Bio</div>
-          <textarea class="field-input" id="aboutEN" rows="3" placeholder="I'm based in Iraq..."></textarea>
-        </div>
-        <div class="field">
-          <div class="field-label">Arabic Bio</div>
-          <textarea class="field-input" id="aboutAR" rows="3" placeholder="أعمل من قلب العراق..."></textarea>
-        </div>
-        <div class="fields-grid two-col">
-          <div class="field">
-            <div class="field-label">Stat 1 — Number</div>
-            <input class="field-input" id="stat1num" type="text" placeholder="3+"/>
+      <!-- HERO -->
+      <div class="section-block active" id="sec-hero">
+        <div class="section-head"><div class="section-head-left"><span class="section-icon">🦸</span><div><div class="section-name">Hero Section</div><div class="section-desc">First thing visitors see</div></div></div></div>
+        <div class="fields-grid">
+          <div class="field"><div class="field-label">Eyebrow badge text</div><input class="field-input" id="heroEyebrow" placeholder="Available for new projects"/></div>
+          <div class="fields-grid two-col">
+            <div class="field"><div class="field-label">Title Line 1</div><input class="field-input" id="heroLine1" placeholder="I build things"/></div>
+            <div class="field"><div class="field-label">Title Line 2 (use &lt;em&gt; for gold italic)</div><input class="field-input" id="heroLine2" placeholder="that &lt;em&gt;work.&lt;/em&gt;"/></div>
           </div>
-          <div class="field">
-            <div class="field-label">Stat 1 — Label</div>
-            <input class="field-input" id="stat1label" type="text" placeholder="Projects Shipped"/>
-          </div>
-          <div class="field">
-            <div class="field-label">Stat 2 — Number</div>
-            <input class="field-input" id="stat2num" type="text" placeholder="1"/>
-          </div>
-          <div class="field">
-            <div class="field-label">Stat 2 — Label</div>
-            <input class="field-input" id="stat2label" type="text" placeholder="AI Bot Built"/>
+          <div class="field"><div class="field-label">Subtitle</div><textarea class="field-input" id="heroSub" rows="2" placeholder="I build smart bots..."></textarea></div>
+          <div class="fields-grid two-col">
+            <div class="field"><div class="field-label">Primary Button Text</div><input class="field-input" id="heroBtnPrimary" placeholder="View Work"/></div>
+            <div class="field"><div class="field-label">Ghost Button Text</div><input class="field-input" id="heroBtnGhost" placeholder="Get in touch"/></div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- APPROACH -->
-    <div class="section-block">
-      <div class="section-head">
-        <span class="section-icon">🧠</span>
-        <div>
-          <div class="section-name">Approach Cards</div>
-          <div class="section-desc">The 3 "how I work" cards</div>
-        </div>
+      <!-- WORK -->
+      <div class="section-block" id="sec-work">
+        <div class="section-head"><div class="section-head-left"><span class="section-icon">💼</span><div><div class="section-name">Work / Projects</div><div class="section-desc">Unlimited — use ↑↓ to reorder</div></div></div></div>
+        <div id="projectsWrap"></div>
+        <button class="btn-add" id="addProjectBtn">+ Add Project Card</button>
       </div>
-      <div id="approachWrap">
-        <!-- generated by JS -->
-      </div>
-    </div>
 
-    <!-- CONTACT -->
-    <div class="section-block">
-      <div class="section-head">
-        <span class="section-icon">📬</span>
-        <div>
-          <div class="section-name">Contact Section</div>
-          <div class="section-desc">Bottom contact card text</div>
+      <!-- ABOUT -->
+      <div class="section-block" id="sec-about">
+        <div class="section-head"><div class="section-head-left"><span class="section-icon">👤</span><div><div class="section-name">About</div><div class="section-desc">Bio + stats</div></div></div></div>
+        <div class="fields-grid">
+          <div class="field"><div class="field-label">English Bio</div><textarea class="field-input" id="aboutEN" rows="3" placeholder="I'm based in Iraq..."></textarea></div>
+          <div class="field"><div class="field-label">Arabic Bio</div><textarea class="field-input" id="aboutAR" rows="3" placeholder="أعمل من قلب العراق..."></textarea></div>
+          <div class="fields-grid two-col">
+            <div class="field"><div class="field-label">Stat 1 Number</div><input class="field-input" id="stat1num" placeholder="3+"/></div>
+            <div class="field"><div class="field-label">Stat 1 Label</div><input class="field-input" id="stat1label" placeholder="Projects Shipped"/></div>
+            <div class="field"><div class="field-label">Stat 2 Number</div><input class="field-input" id="stat2num" placeholder="1"/></div>
+            <div class="field"><div class="field-label">Stat 2 Label</div><input class="field-input" id="stat2label" placeholder="AI Bot Built"/></div>
+          </div>
         </div>
       </div>
-      <div class="fields-grid">
-        <div class="field">
-          <div class="field-label">Contact Title</div>
-          <input class="field-input" id="contactTitle" type="text" placeholder="Let's build something great"/>
-        </div>
-        <div class="field">
-          <div class="field-label">Contact Subtitle</div>
-          <textarea class="field-input" id="contactSub" rows="2" placeholder="Have a project in mind?..."></textarea>
-        </div>
-      </div>
-    </div>
 
-    <!-- FOOTER -->
-    <div class="section-block">
-      <div class="section-head">
-        <span class="section-icon">🔻</span>
-        <div>
-          <div class="section-name">Footer</div>
-          <div class="section-desc">Bottom line text (year auto-appended)</div>
+      <!-- APPROACH -->
+      <div class="section-block" id="sec-approach">
+        <div class="section-head"><div class="section-head-left"><span class="section-icon">🧠</span><div><div class="section-name">Approach Cards</div><div class="section-desc">The "how I work" cards</div></div></div></div>
+        <div id="approachWrap"></div>
+        <button class="btn-add" id="addApproachBtn">+ Add Card</button>
+      </div>
+
+      <!-- BOTS -->
+      <div class="section-block" id="sec-bots">
+        <div class="section-head"><div class="section-head-left"><span class="section-icon">🤖</span><div><div class="section-name">Bots Panel</div><div class="section-desc">Cards in your بوتاتي panel</div></div></div></div>
+        <div id="botsWrap"></div>
+        <button class="btn-add" id="addBotBtn">+ Add Bot Slot</button>
+      </div>
+
+      <!-- CONTACT -->
+      <div class="section-block" id="sec-contact">
+        <div class="section-head"><div class="section-head-left"><span class="section-icon">📬</span><div><div class="section-name">Contact</div><div class="section-desc">Bottom contact card + social links</div></div></div></div>
+        <div class="fields-grid">
+          <div class="field"><div class="field-label">Title</div><input class="field-input" id="contactTitle" placeholder="Let's build something great"/></div>
+          <div class="field"><div class="field-label">Subtitle</div><textarea class="field-input" id="contactSub" rows="2" placeholder="Have a project in mind?..."></textarea></div>
+          <div class="field"><div class="field-label">Email</div><input class="field-input" id="contactEmail" type="email" placeholder="almour10k@gmail.com"/></div>
+          <div class="fields-grid three-col">
+            <div class="field"><div class="field-label">GitHub URL</div><input class="field-input" id="socialGithub" placeholder="https://github.com/..."/></div>
+            <div class="field"><div class="field-label">LinkedIn URL</div><input class="field-input" id="socialLinkedin" placeholder="https://linkedin.com/..."/></div>
+            <div class="field"><div class="field-label">WhatsApp Number</div><input class="field-input" id="socialWhatsapp" placeholder="+9647712343468"/></div>
+          </div>
         </div>
       </div>
-      <div class="field">
-        <div class="field-label">Footer Text</div>
-        <input class="field-input" id="footer" type="text" placeholder="Built with obsession · Karbala, Iraq ·"/>
-      </div>
-    </div>
 
+      <!-- FOOTER -->
+      <div class="section-block" id="sec-footer">
+        <div class="section-head"><div class="section-head-left"><span class="section-icon">🔻</span><div><div class="section-name">Footer</div><div class="section-desc">Bottom line (year auto-added)</div></div></div></div>
+        <div class="field"><div class="field-label">Footer Text</div><input class="field-input" id="footer" placeholder="Built with obsession · Karbala, Iraq"/></div>
+      </div>
+
+    </div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script type="module">
-  import { initializeApp }                                        from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, doc, getDoc, setDoc }                    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-  import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { initializeApp }     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-  const firebaseConfig = {
-    apiKey: "PASTE_YOUR_REAL_APIKEY_HERE",
-    authDomain: "my-portfolio-da5f2.firebaseapp.com",
-    projectId: "my-portfolio-da5f2",
-    storageBucket: "my-portfolio-da5f2.firebasestorage.app",
-    messagingSenderId: "425746037669",
-    appId: "1:425746037669:web:e1464f1ac4cfcb4e02864c",
-    measurementId: "G-4X8E9PC11W"
-  };
+// 🔧 YOUR FIREBASE CONFIG — paste your real apiKey
+const firebaseConfig = {
+  apiKey: "PAIzaSyDer0I6uU2Q2HPBTpkDMZnFzeiVYBRjWg8",
+  authDomain: "my-portfolio-da5f2.firebaseapp.com",
+  projectId: "my-portfolio-da5f2",
+  storageBucket: "my-portfolio-da5f2.firebasestorage.app",
+  messagingSenderId: "425746037669",
+  appId: "1:425746037669:web:e1464f1ac4cfcb4e02864c"
+};
 
-  // 🔒 YOUR EMAIL — only this Google account can access admin
-  const ALLOWED_EMAIL = "almour10k@gmail.com";
+// 🔒 ONLY THIS EMAIL CAN ACCESS ADMIN
+const ALLOWED_EMAIL = "almour10k@gmail.com";
 
-  const app  = initializeApp(firebaseConfig);
-  const db   = getFirestore(app);
-  const auth = getAuth(app);
-  const provider = new GoogleAuthProvider();
+const app      = initializeApp(firebaseConfig);
+const db       = getFirestore(app);
+const auth     = getAuth(app);
+const provider = new GoogleAuthProvider();
 
-  // ── AUTH STATE — runs on every page load ──
-  onAuthStateChanged(auth, user => {
-    if (user && user.email === ALLOWED_EMAIL) {
-      document.getElementById('login-screen').style.display = 'none';
-      document.getElementById('admin-app').style.display = 'block';
-      document.getElementById('adminUserName').textContent = user.displayName || user.email;
-      loadData();
-    } else {
-      document.getElementById('login-screen').style.display = 'flex';
-      document.getElementById('admin-app').style.display = 'none';
-    }
-  });
+let projects   = [];
+let approaches = [];
+let bots       = [];
 
-  // ── GOOGLE LOGIN ──
-  async function doGoogleLogin() {
-    try {
-      const result = await signInWithPopup(auth, provider);
-      if (result.user.email !== ALLOWED_EMAIL) {
-        await signOut(auth);
-        document.getElementById('loginError').style.display = 'block';
-      }
-    } catch(e) {
-      console.error('Login failed:', e.message);
-    }
-  }
-
-  // ── LOGOUT ──
-  function logout() { signOut(auth); }
-
-  // ── PROJECT CARDS ──
-  const projects = [
-    { key:'project1', num:'01', defaultTag:'AI · WhatsApp Bot',   defaultTitle:'Alamani Smart Bot',            defaultDesc:'AI-powered WhatsApp sales bot for an electronics store in Karbala.' },
-    { key:'project2', num:'02', defaultTag:'Web · Full Stack',     defaultTitle:'Restaurant Management POS',    defaultDesc:'Describe your second project here.' },
-    { key:'project3', num:'03', defaultTag:'Web · Full Stack',     defaultTitle:'Barber Management Dashboard',  defaultDesc:'Describe your third project here.' },
-    { key:'project4', num:'04', defaultTag:'Web · Design',         defaultTitle:'RealEstate — العقار',          defaultDesc:'Another project slot.' },
-  ];
-  const approaches = [
-    { key:'approach1', defaultTitle:'AI where it matters', defaultText:'I use AI to solve real problems — not to look impressive.' },
-    { key:'approach2', defaultTitle:'Built to work',       defaultText:'Pretty is useless if it breaks. Everything I build is tested and reliable.' },
-    { key:'approach3', defaultTitle:'Direct communication',defaultText:'No corporate speak. Honest, always.' },
-  ];
-
-  // Build project fields
-  const pw = document.getElementById('projectsWrap');
-  projects.forEach(p => {
-    pw.innerHTML += `
-      <div class="project-block">
-        <div class="project-num">Project ${p.num}</div>
-        <div class="fields-grid">
-          <div class="fields-grid two-col">
-            <div class="field"><div class="field-label">Tag</div><input class="field-input" id="${p.key}_tag" type="text" placeholder="${p.defaultTag}"/></div>
-            <div class="field"><div class="field-label">Title</div><input class="field-input" id="${p.key}_title" type="text" placeholder="${p.defaultTitle}"/></div>
-          </div>
-          <div class="field"><div class="field-label">Description</div><textarea class="field-input" id="${p.key}_desc" rows="2" placeholder="${p.defaultDesc}"></textarea></div>
-        </div>
-      </div>`;
-  });
-
-  // Build approach fields
-  const aw = document.getElementById('approachWrap');
-  approaches.forEach((a,i) => {
-    aw.innerHTML += `
-      <div class="project-block">
-        <div class="project-num">Card ${i+1}</div>
-        <div class="fields-grid two-col">
-          <div class="field"><div class="field-label">Title</div><input class="field-input" id="${a.key}_title" type="text" placeholder="${a.defaultTitle}"/></div>
-          <div class="field"><div class="field-label">Text</div><input class="field-input" id="${a.key}_text" type="text" placeholder="${a.defaultText}"/></div>
-        </div>
-      </div>`;
-  });
-
-  // ── LOGIN ──
-  window.doLogin = function() {
-    const pass = document.getElementById('loginPass').value;
-    if (pass === ADMIN_PASSWORD) {
-      document.getElementById('login-screen').style.display = 'none';
-      document.getElementById('admin-app').style.display = 'block';
-      loadData();
-    } else {
-      document.getElementById('loginError').style.display = 'block';
-      document.getElementById('loginPass').value = '';
-    }
-  };
-
-  window.logout = function() {
+// ── AUTH ──
+onAuthStateChanged(auth, user => {
+  if (user && user.email === ALLOWED_EMAIL) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('admin-app').style.display    = 'block';
+    document.getElementById('adminUserName').textContent  = user.displayName || user.email;
+    loadData();
+  } else {
     document.getElementById('login-screen').style.display = 'flex';
-    document.getElementById('admin-app').style.display = 'none';
-  };
-
-  // ── LOAD ──
-  async function loadData() {
-    try {
-      const snap = await getDoc(doc(db, "portfolio", "content"));
-      if (!snap.exists()) return;
-      const d = snap.data();
-
-      const set = (id, val) => { if(val !== undefined){ const el = document.getElementById(id); if(el) el.value = val; }};
-
-      set('heroEyebrow', d.heroEyebrow);
-      set('heroLine1',   d.heroLine1);
-      set('heroLine2',   d.heroLine2);
-      set('heroSub',     d.heroSub);
-      set('aboutEN',     d.aboutEN);
-      set('aboutAR',     d.aboutAR);
-      set('stat1num',    d.stat1num);
-      set('stat1label',  d.stat1label);
-      set('stat2num',    d.stat2num);
-      set('stat2label',  d.stat2label);
-      set('contactTitle',d.contactTitle);
-      set('contactSub',  d.contactSub);
-      set('footer',      d.footer);
-
-      projects.forEach(p => {
-        if (d[p.key]) {
-          set(p.key+'_tag',   d[p.key].tag);
-          set(p.key+'_title', d[p.key].title);
-          set(p.key+'_desc',  d[p.key].desc);
-        }
-      });
-      approaches.forEach(a => {
-        if (d[a.key]) {
-          set(a.key+'_title', d[a.key].title);
-          set(a.key+'_text',  d[a.key].text);
-        }
-      });
-
-      showToast('Loaded current content ✓', false);
-    } catch(e) {
-      showToast('Load failed: ' + e.message, true);
-    }
+    document.getElementById('admin-app').style.display    = 'none';
   }
+});
 
-  // ── SAVE ──
-  window.saveAll = async function() {
-    const btn = document.getElementById('saveBtn');
-    btn.disabled = true;
-    btn.textContent = 'Saving...';
-
-    const get = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
-
-    const data = {
-      heroEyebrow:  get('heroEyebrow'),
-      heroLine1:    get('heroLine1'),
-      heroLine2:    get('heroLine2'),
-      heroSub:      get('heroSub'),
-      aboutEN:      get('aboutEN'),
-      aboutAR:      get('aboutAR'),
-      stat1num:     get('stat1num'),
-      stat1label:   get('stat1label'),
-      stat2num:     get('stat2num'),
-      stat2label:   get('stat2label'),
-      contactTitle: get('contactTitle'),
-      contactSub:   get('contactSub'),
-      footer:       get('footer'),
-    };
-
-    projects.forEach(p => {
-      data[p.key] = { tag: get(p.key+'_tag'), title: get(p.key+'_title'), desc: get(p.key+'_desc') };
-    });
-    approaches.forEach(a => {
-      data[a.key] = { title: get(a.key+'_title'), text: get(a.key+'_text') };
-    });
-
-    try {
-      await setDoc(doc(db, "portfolio", "content"), data);
-      showToast('✅ Saved & live instantly!', false);
-    } catch(e) {
-      showToast('❌ Save failed: ' + e.message, true);
+document.getElementById('googleLoginBtn').addEventListener('click', async () => {
+  try {
+    const result = await signInWithPopup(auth, provider);
+    if (result.user.email !== ALLOWED_EMAIL) {
+      await signOut(auth);
+      document.getElementById('loginError').style.display = 'block';
     }
+  } catch(e) { showToast('Login error: ' + e.message, true); }
+});
 
-    btn.disabled = false;
-    btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save & Publish`;
+document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
+
+// ── SIDEBAR ──
+document.querySelectorAll('.sidebar-link').forEach(link => {
+  link.addEventListener('click', () => {
+    document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+    document.querySelectorAll('.section-block').forEach(s => s.classList.remove('active'));
+    link.classList.add('active');
+    document.getElementById('sec-' + link.dataset.section).classList.add('active');
+  });
+});
+
+// ── RENDER PROJECTS ──
+function renderProjects() {
+  const wrap = document.getElementById('projectsWrap');
+  wrap.innerHTML = '';
+  projects.forEach((p, i) => {
+    const div = document.createElement('div');
+    div.className = 'item-card';
+    div.innerHTML = `
+      <div class="item-card-header">
+        <div class="item-card-num">Project ${String(i+1).padStart(2,'0')}</div>
+        <div class="item-card-actions">
+          ${i > 0 ? `<button class="btn-icon" data-action="up" data-i="${i}">↑</button>` : ''}
+          ${i < projects.length-1 ? `<button class="btn-icon" data-action="down" data-i="${i}">↓</button>` : ''}
+          <button class="btn-icon btn-del" data-action="del-p" data-i="${i}">✕ Remove</button>
+        </div>
+      </div>
+      <div class="fields-grid">
+        <div class="fields-grid two-col">
+          <div class="field"><div class="field-label">Tag</div><input class="field-input" data-f="tag" data-i="${i}" value="${esc(p.tag)}" placeholder="AI · WhatsApp Bot"/></div>
+          <div class="field"><div class="field-label">Title</div><input class="field-input" data-f="title" data-i="${i}" value="${esc(p.title)}" placeholder="Project Title"/></div>
+        </div>
+        <div class="field"><div class="field-label">Description</div><textarea class="field-input" data-f="desc" data-i="${i}" rows="2" placeholder="What it does...">${esc(p.desc)}</textarea></div>
+        <div class="fields-grid two-col">
+          <div class="field"><div class="field-label">URL (opens in mac popup)</div><input class="field-input" data-f="url" data-i="${i}" value="${esc(p.url)}" placeholder="https://..."/></div>
+          <div class="field">
+            <div class="field-label">Status Badge</div>
+            <select class="field-input" data-f="status" data-i="${i}">
+              <option value="live" ${p.status==='live'?'selected':''}>🟢 Live</option>
+              <option value="soon" ${p.status==='soon'?'selected':''}>🟡 Coming Soon</option>
+              <option value="wip"  ${p.status==='wip'?'selected':''}>🔵 Work in Progress</option>
+              <option value="none" ${p.status==='none'?'selected':''}>No badge</option>
+            </select>
+          </div>
+        </div>
+      </div>`;
+    wrap.appendChild(div);
+  });
+  // events
+  wrap.querySelectorAll('[data-action]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const i = +btn.dataset.i;
+      if(btn.dataset.action==='up'){ [projects[i],projects[i-1]]=[projects[i-1],projects[i]]; }
+      else if(btn.dataset.action==='down'){ [projects[i],projects[i+1]]=[projects[i+1],projects[i]]; }
+      else if(btn.dataset.action==='del-p'){ projects.splice(i,1); }
+      renderProjects();
+    });
+  });
+  wrap.querySelectorAll('[data-f]').forEach(el => {
+    el.addEventListener('change', () => { projects[+el.dataset.i][el.dataset.f] = el.value; });
+    el.addEventListener('input',  () => { projects[+el.dataset.i][el.dataset.f] = el.value; });
+  });
+}
+
+// ── RENDER APPROACH ──
+function renderApproach() {
+  const wrap = document.getElementById('approachWrap');
+  wrap.innerHTML = '';
+  approaches.forEach((a, i) => {
+    const div = document.createElement('div');
+    div.className = 'item-card';
+    div.innerHTML = `
+      <div class="item-card-header">
+        <div class="item-card-num">Card ${i+1}</div>
+        <button class="btn-icon btn-del" data-i="${i}">✕ Remove</button>
+      </div>
+      <div class="fields-grid two-col">
+        <div class="field"><div class="field-label">Icon (emoji)</div><input class="field-input" data-f="icon" data-i="${i}" value="${esc(a.icon)}" placeholder="🧠"/></div>
+        <div class="field"><div class="field-label">Title</div><input class="field-input" data-f="title" data-i="${i}" value="${esc(a.title)}" placeholder="Card title"/></div>
+        <div class="field" style="grid-column:span 2"><div class="field-label">Text</div><textarea class="field-input" data-f="text" data-i="${i}" rows="2" placeholder="Description...">${esc(a.text)}</textarea></div>
+      </div>`;
+    wrap.appendChild(div);
+  });
+  wrap.querySelectorAll('.btn-del').forEach(btn => btn.addEventListener('click', () => { approaches.splice(+btn.dataset.i,1); renderApproach(); }));
+  wrap.querySelectorAll('[data-f]').forEach(el => {
+    el.addEventListener('change', () => { approaches[+el.dataset.i][el.dataset.f] = el.value; });
+    el.addEventListener('input',  () => { approaches[+el.dataset.i][el.dataset.f] = el.value; });
+  });
+}
+
+// ── RENDER BOTS ──
+function renderBots() {
+  const wrap = document.getElementById('botsWrap');
+  wrap.innerHTML = '';
+  bots.forEach((b, i) => {
+    const div = document.createElement('div');
+    div.className = 'item-card';
+    div.innerHTML = `
+      <div class="item-card-header">
+        <div class="item-card-num">Bot Slot ${i+1}</div>
+        <button class="btn-icon btn-del" data-i="${i}">✕ Remove</button>
+      </div>
+      <div class="fields-grid">
+        <div class="fields-grid two-col">
+          <div class="field"><div class="field-label">Icon (emoji)</div><input class="field-input" data-f="icon" data-i="${i}" value="${esc(b.icon)}" placeholder="🛍️"/></div>
+          <div class="field"><div class="field-label">Name</div><input class="field-input" data-f="name" data-i="${i}" value="${esc(b.name)}" placeholder="Alamani Smart Bot"/></div>
+        </div>
+        <div class="field"><div class="field-label">Description</div><input class="field-input" data-f="desc" data-i="${i}" value="${esc(b.desc)}" placeholder="بوت مبيعات واتساب..."/></div>
+        <div class="fields-grid two-col">
+          <div class="field"><div class="field-label">URL (leave empty = no preview)</div><input class="field-input" data-f="url" data-i="${i}" value="${esc(b.url)}" placeholder="https://... or empty"/></div>
+          <div class="field">
+            <div class="field-label">Badge</div>
+            <select class="field-input" data-f="badge" data-i="${i}">
+              <option value="live" ${b.badge==='live'?'selected':''}>🟢 Live</option>
+              <option value="soon" ${b.badge==='soon'||!b.badge?'selected':''}>🟡 Soon</option>
+            </select>
+          </div>
+        </div>
+      </div>`;
+    wrap.appendChild(div);
+  });
+  wrap.querySelectorAll('.btn-del').forEach(btn => btn.addEventListener('click', () => { bots.splice(+btn.dataset.i,1); renderBots(); }));
+  wrap.querySelectorAll('[data-f]').forEach(el => {
+    el.addEventListener('change', () => { bots[+el.dataset.i][el.dataset.f] = el.value; });
+    el.addEventListener('input',  () => { bots[+el.dataset.i][el.dataset.f] = el.value; });
+  });
+}
+
+function esc(v){ return (v||'').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ── ADD BUTTONS ──
+document.getElementById('addProjectBtn').addEventListener('click', () => {
+  projects.push({ tag:'', title:'', desc:'', url:'', status:'live' });
+  renderProjects();
+  document.getElementById('projectsWrap').lastElementChild?.scrollIntoView({ behavior:'smooth' });
+});
+document.getElementById('addApproachBtn').addEventListener('click', () => {
+  approaches.push({ icon:'⚡', title:'', text:'' });
+  renderApproach();
+});
+document.getElementById('addBotBtn').addEventListener('click', () => {
+  bots.push({ icon:'🤖', name:'', desc:'', url:'', badge:'soon' });
+  renderBots();
+});
+
+// ── LOAD ──
+async function loadData() {
+  try {
+    const snap = await getDoc(doc(db, "portfolio", "content"));
+    if (!snap.exists()) { renderProjects(); renderApproach(); renderBots(); return; }
+    const d = snap.data();
+    const set = (id, val) => { if(val!==undefined){ const el=document.getElementById(id); if(el) el.value=val; }};
+    set('heroEyebrow',   d.heroEyebrow);
+    set('heroLine1',     d.heroLine1);
+    set('heroLine2',     d.heroLine2);
+    set('heroSub',       d.heroSub);
+    set('heroBtnPrimary',d.heroBtnPrimary);
+    set('heroBtnGhost',  d.heroBtnGhost);
+    set('aboutEN',       d.aboutEN);
+    set('aboutAR',       d.aboutAR);
+    set('stat1num',      d.stat1num);
+    set('stat1label',    d.stat1label);
+    set('stat2num',      d.stat2num);
+    set('stat2label',    d.stat2label);
+    set('contactTitle',  d.contactTitle);
+    set('contactSub',    d.contactSub);
+    set('contactEmail',  d.contactEmail);
+    set('socialGithub',  d.socialGithub);
+    set('socialLinkedin',d.socialLinkedin);
+    set('socialWhatsapp',d.socialWhatsapp);
+    set('footer',        d.footer);
+    projects   = d.projects   || [];
+    approaches = d.approaches || [];
+    bots       = d.bots       || [];
+    renderProjects(); renderApproach(); renderBots();
+    showToast('Loaded ✓', false);
+  } catch(e) { showToast('Load failed: ' + e.message, true); }
+}
+
+// ── SAVE ──
+document.getElementById('saveBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('saveBtn');
+  btn.disabled = true; btn.textContent = 'Saving...';
+  const get = id => { const el=document.getElementById(id); return el?el.value.trim():''; };
+  const data = {
+    heroEyebrow:get('heroEyebrow'), heroLine1:get('heroLine1'), heroLine2:get('heroLine2'),
+    heroSub:get('heroSub'), heroBtnPrimary:get('heroBtnPrimary'), heroBtnGhost:get('heroBtnGhost'),
+    aboutEN:get('aboutEN'), aboutAR:get('aboutAR'),
+    stat1num:get('stat1num'), stat1label:get('stat1label'), stat2num:get('stat2num'), stat2label:get('stat2label'),
+    contactTitle:get('contactTitle'), contactSub:get('contactSub'), contactEmail:get('contactEmail'),
+    socialGithub:get('socialGithub'), socialLinkedin:get('socialLinkedin'), socialWhatsapp:get('socialWhatsapp'),
+    footer:get('footer'),
+    projects, approaches, bots,
   };
+  try {
+    await setDoc(doc(db, "portfolio", "content"), data);
+    showToast('✅ Saved & live!', false);
+  } catch(e) { showToast('❌ ' + e.message, true); }
+  btn.disabled = false;
+  btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save &amp; Publish`;
+});
 
-  function showToast(msg, isErr) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.className = 'toast show' + (isErr ? ' err' : '');
-    setTimeout(() => t.className = 'toast', 3000);
-  }
+function showToast(msg, isErr) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isErr?' err':'');
+  setTimeout(() => t.className='toast', 3000);
+}
 </script>
 </body>
 </html>
