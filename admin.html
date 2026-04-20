@@ -256,9 +256,7 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
   const db  = getFirestore(app);
 
   // ── PASSWORD (change this to whatever you want) ──
-  const ADMIN_PASSWORD = "flamewolf";
-
-  // ── PROJECT CARDS ──
+  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;  // ── PROJECT CARDS ──
   const projects = [
     { key:'project1', num:'01', defaultTag:'AI · WhatsApp Bot',   defaultTitle:'Alamani Smart Bot',            defaultDesc:'AI-powered WhatsApp sales bot for an electronics store in Karbala.' },
     { key:'project2', num:'02', defaultTag:'Web · Full Stack',     defaultTitle:'Restaurant Management POS',    defaultDesc:'Describe your second project here.' },
