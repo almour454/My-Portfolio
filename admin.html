@@ -98,8 +98,7 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
     </div>
     <div class="header-right">
       <div class="user-pill"><div class="user-avatar">👤</div><span id="adminUserName"></span></div>
-      <button class="btn-seed" id="seedBtn" style="background:rgba(37,211,102,0.15);border:1px solid rgba(37,211,102,0.3);border-radius:9px;padding:9px 16px;color:#25d366;font-size:12px;font-family:Syne,sans-serif;cursor:pointer;font-weight:600;">⚡ Load My Content</button>
-      <button class="btn-save" id="saveBtn">
+<button class="btn-save" id="saveBtn">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
         Save &amp; Publish
       </button>
@@ -115,6 +114,7 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
       <div class="sidebar-link" data-section="approach"><span class="sl-icon">🧠</span> Approach</div>
       <div class="sidebar-link" data-section="bots"><span class="sl-icon">🤖</span> Bots Panel</div>
       <div class="sidebar-link" data-section="contact"><span class="sl-icon">📬</span> Contact</div>
+      <div class="sidebar-link" data-section="stack"><span class="sl-icon">🛠️</span> Stack</div>
       <div class="sidebar-link" data-section="footer"><span class="sl-icon">🔻</span> Footer</div>
     </div>
 
@@ -188,6 +188,13 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
         </div>
       </div>
 
+      <!-- STACK -->
+      <div class="section-block" id="sec-stack">
+        <div class="section-head"><div class="section-head-left"><span class="section-icon">🛠️</span><div><div class="section-name">Tech Stack Badges</div><div class="section-desc">The badges shown in the stack section — add or remove freely</div></div></div></div>
+        <div id="stackWrap"></div>
+        <button class="btn-add" id="addStackBtn">+ Add Badge</button>
+      </div>
+
       <!-- FOOTER -->
       <div class="section-block" id="sec-footer">
         <div class="section-head"><div class="section-head-left"><span class="section-icon">🔻</span><div><div class="section-name">Footer</div><div class="section-desc">Bottom line (year auto-added)</div></div></div></div>
@@ -226,6 +233,7 @@ const provider = new GoogleAuthProvider();
 let projects   = [];
 let approaches = [];
 let bots       = [];
+let stackBadges = [];
 
 // ── AUTH ──
 onAuthStateChanged(auth, user => {
@@ -379,9 +387,32 @@ function renderBots() {
   });
 }
 
+function renderStack() {
+  const wrap = document.getElementById('stackWrap');
+  wrap.innerHTML = '';
+  stackBadges.forEach((b, i) => {
+    const div = document.createElement('div');
+    div.className = 'item-card';
+    div.style.cssText = 'padding:14px 18px;display:flex;align-items:center;gap:12px;margin-bottom:10px';
+    div.innerHTML = `
+      <div class="field" style="flex:0 0 80px"><div class="field-label">Icon</div><input class="field-input" data-f="icon" data-i="${i}" value="${esc(b.icon)}" placeholder="🟢" style="text-align:center;font-size:18px"/></div>
+      <div class="field" style="flex:1"><div class="field-label">Label</div><input class="field-input" data-f="label" data-i="${i}" value="${esc(b.label)}" placeholder="Node.js / Express"/></div>
+      <button class="btn-icon btn-del" data-i="${i}" style="flex-shrink:0;margin-top:18px">✕</button>`;
+    wrap.appendChild(div);
+  });
+  wrap.querySelectorAll('.btn-del').forEach(btn => btn.addEventListener('click', () => { stackBadges.splice(+btn.dataset.i,1); renderStack(); }));
+  wrap.querySelectorAll('[data-f]').forEach(el => {
+    el.addEventListener('input', () => { stackBadges[+el.dataset.i][el.dataset.f] = el.value; });
+  });
+}
+
 function esc(v){ return (v||'').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 // ── ADD BUTTONS ──
+document.getElementById('addStackBtn').addEventListener('click', () => {
+  stackBadges.push({ icon:'⚡', label:'' });
+  renderStack();
+});
 document.getElementById('addProjectBtn').addEventListener('click', () => {
   projects.push({ tag:'', title:'', desc:'', url:'', status:'live' });
   renderProjects();
@@ -422,10 +453,15 @@ async function loadData() {
     set('socialLinkedin',d.socialLinkedin);
     set('socialWhatsapp',d.socialWhatsapp);
     set('footer',        d.footer);
-    projects   = d.projects   || [];
-    approaches = d.approaches || [];
-    bots       = d.bots       || [];
-    renderProjects(); renderApproach(); renderBots();
+    projects    = d.projects    || [];
+    approaches  = d.approaches  || [];
+    bots        = d.bots        || [];
+    stackBadges = d.stackBadges || [
+      {icon:'🟢',label:'Node.js / Express'},{icon:'⚛️',label:'React'},{icon:'🌊',label:'Tailwind CSS'},
+      {icon:'🔥',label:'Firebase'},{icon:'🤖',label:'Puppeteer / APIs'},{icon:'🧠',label:'OpenAI / AI APIs'},
+      {icon:'💬',label:'WhatsApp Business API'},{icon:'⚡',label:'Vanilla JS'}
+    ];
+    renderProjects(); renderApproach(); renderBots(); renderStack();
     showToast('Loaded ✓', false);
   } catch(e) { showToast('Load failed: ' + e.message, true); }
 }
@@ -443,7 +479,7 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
     contactTitle:get('contactTitle'), contactSub:get('contactSub'), contactEmail:get('contactEmail'),
     socialGithub:get('socialGithub'), socialLinkedin:get('socialLinkedin'), socialWhatsapp:get('socialWhatsapp'),
     footer:get('footer'),
-    projects, approaches, bots,
+    projects, approaches, bots, stackBadges,
   };
   try {
     await setDoc(doc(db, "portfolio", "content"), data);

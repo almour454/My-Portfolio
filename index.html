@@ -795,7 +795,7 @@ window.addEventListener('mousemove',e=>{const x=(e.clientX/window.innerWidth-0.5
 
   let currentUrl = '';
 
-  function openPopup(title, tag, url){
+  window.openPopup = function openPopup(title, tag, url){
     currentUrl = url;
     tagPill.textContent  = tag;
     titleTxt.textContent = title;
@@ -818,7 +818,7 @@ window.addEventListener('mousemove',e=>{const x=(e.clientX/window.innerWidth-0.5
     // tiny delay so CSS transition fires
     requestAnimationFrame(()=>requestAnimationFrame(()=>win.classList.add('open')));
     document.body.style.overflow = 'hidden';
-  }
+  };
 
   function closePopup(){
     win.classList.remove('open');
@@ -929,16 +929,15 @@ window.addEventListener('mousemove',e=>{const x=(e.clientX/window.innerWidth-0.5
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  // 🔧 PASTE YOUR FIREBASE CONFIG HERE
   const firebaseConfig = {
-  apiKey: "AIzaSyDer0I6uU2Q2HPBTpkDMZnFzeiVYBRjWg8",
-  authDomain: "my-portfolio-da5f2.firebaseapp.com",
-  projectId: "my-portfolio-da5f2",
-  storageBucket: "my-portfolio-da5f2.firebasestorage.app",
-  messagingSenderId: "425746037669",
-  appId: "1:425746037669:web:e1464f1ac4cfcb4e02864c",
-  measurementId: "G-4X8E9PC11W"
-};
+    apiKey: "AIzaSyDer0I6uU2Q2HPBTpkDMZnFzeiVYBRjWg8",
+    authDomain: "my-portfolio-da5f2.firebaseapp.com",
+    projectId: "my-portfolio-da5f2",
+    storageBucket: "my-portfolio-da5f2.firebasestorage.app",
+    messagingSenderId: "425746037669",
+    appId: "1:425746037669:web:e1464f1ac4cfcb4e02864c",
+    measurementId: "G-4X8E9PC11W"
+  };
 
   const app = initializeApp(firebaseConfig);
   const db  = getFirestore(app);
@@ -950,20 +949,80 @@ window.addEventListener('mousemove',e=>{const x=(e.clientX/window.innerWidth-0.5
       const d = snap.data();
 
       // ── HERO ──
-      if (d.heroEyebrow)   document.querySelector('.hero-eyebrow').childNodes[1].textContent = d.heroEyebrow;
-      if (d.heroLine1)     document.querySelectorAll('.hero-title-big .word')[0].innerHTML = d.heroLine1;
-      if (d.heroLine2)     document.querySelectorAll('.hero-title-big .word')[1].innerHTML = d.heroLine2;
-      if (d.heroSub)       document.querySelector('.hero-sub').textContent = d.heroSub;
+      if (d.heroEyebrow) {
+        const ey = document.querySelector('.hero-eyebrow');
+        if (ey) ey.textContent = d.heroEyebrow;
+      }
+      if (d.heroLine1) {
+        const w = document.querySelectorAll('.hero-title-big .word');
+        if (w[0]) w[0].innerHTML = d.heroLine1;
+      }
+      if (d.heroLine2) {
+        const w = document.querySelectorAll('.hero-title-big .word');
+        if (w[1]) w[1].innerHTML = d.heroLine2;
+      }
+      if (d.heroSub) {
+        const el = document.querySelector('.hero-sub');
+        if (el) el.textContent = d.heroSub;
+      }
+      if (d.heroBtnPrimary) {
+        const el = document.querySelector('.btn-primary');
+        if (el) el.childNodes[0].textContent = d.heroBtnPrimary;
+      }
+      if (d.heroBtnGhost) {
+        const el = document.querySelector('.btn-ghost');
+        if (el) el.textContent = d.heroBtnGhost;
+      }
 
-      // ── WORK CARDS ──
-      const cards = document.querySelectorAll('.work-card');
-      ['project1','project2','project3','project4'].forEach((key, i) => {
-        if (d[key] && cards[i]) {
-          if (d[key].tag)   cards[i].querySelector('.work-tag').textContent  = d[key].tag;
-          if (d[key].title) cards[i].querySelector('.work-title').textContent = d[key].title;
-          if (d[key].desc)  cards[i].querySelector('.work-desc').textContent  = d[key].desc;
+      // ── WORK CARDS — rebuild from array ──
+      if (d.projects && d.projects.length) {
+        const grid = document.querySelector('.work-grid');
+        if (grid) {
+          const statusMap = { live:'Live', soon:'Coming Soon', wip:'Work in Progress' };
+          grid.innerHTML = d.projects.map((p, i) => {
+            const num = String(i+1).padStart(2,'0');
+            const badge = p.status && p.status !== 'none'
+              ? `<span class="work-tag" style="margin-left:auto;font-size:9px;padding:2px 8px;border-radius:100px;background:${p.status==='live'?'rgba(37,211,102,0.15)':p.status==='wip'?'rgba(100,150,255,0.15)':'rgba(201,168,76,0.1)'};color:${p.status==='live'?'#25d366':p.status==='wip'?'#6496ff':'var(--gold)'};border:1px solid ${p.status==='live'?'rgba(37,211,102,0.3)':p.status==='wip'?'rgba(100,150,255,0.3)':'var(--gold-dim)'};">${statusMap[p.status]||''}</span>`
+              : '';
+            const delay = ['delay-1','delay-2','delay-3','delay-4'][i] || 'delay-4';
+            return `<div class="work-card glass reveal ${delay}" data-tilt="">
+              <span class="work-num">${num}</span>
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                <span class="work-tag">${p.tag||''}</span>${badge}
+              </div>
+              <h3 class="work-title">${p.title||''}</h3>
+              <p class="work-desc">${p.desc||''}</p>
+              <a href="#" class="work-link popup-trigger"
+                data-title="${p.title||''}"
+                data-tag="${p.tag||''}"
+                data-url="${p.url||''}">
+                View project
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+              </a>
+            </div>`;
+          }).join('');
+          // re-observe new cards for reveal animation
+          document.querySelectorAll('.work-card.reveal').forEach(el => observer.observe(el));
+          // re-apply tilt
+          document.querySelectorAll('[data-tilt]').forEach(card => {
+            card.addEventListener('mousemove', e => {
+              const rect = card.getBoundingClientRect();
+              const cx = rect.left+rect.width/2, cy = rect.top+rect.height/2;
+              const dx = (e.clientX-cx)/(rect.width/2), dy = (e.clientY-cy)/(rect.height/2);
+              card.style.transform = `perspective(800px) rotateX(${-dy*6}deg) rotateY(${dx*6}deg) translateY(-8px)`;
+            });
+            card.addEventListener('mouseleave', () => { card.style.transform=''; card.style.transition='transform 0.5s cubic-bezier(0.16,1,0.3,1)'; });
+            card.addEventListener('mouseenter', () => { card.style.transition='transform 0.1s ease'; });
+          });
+          // re-wire popup triggers
+          document.querySelectorAll('.popup-trigger').forEach(link => {
+            link.addEventListener('click', e => {
+              e.preventDefault();
+              if (window.openPopup) window.openPopup(link.dataset.title, link.dataset.tag, link.dataset.url);
+            });
+          });
         }
-      });
+      }
 
       // ── ABOUT ──
       const aboutPs = document.querySelectorAll('.about-text p');
@@ -971,28 +1030,74 @@ window.addEventListener('mousemove',e=>{const x=(e.clientX/window.innerWidth-0.5
       if (d.aboutAR && aboutPs[1]) aboutPs[1].textContent = d.aboutAR;
 
       // ── STATS ──
-      const statNums = document.querySelectorAll('.stat-num');
+      const statNums   = document.querySelectorAll('.stat-num');
       const statLabels = document.querySelectorAll('.stat-label');
       if (d.stat1num   && statNums[0])   statNums[0].textContent   = d.stat1num;
       if (d.stat1label && statLabels[0]) statLabels[0].textContent = d.stat1label;
       if (d.stat2num   && statNums[1])   statNums[1].textContent   = d.stat2num;
       if (d.stat2label && statLabels[1]) statLabels[1].textContent = d.stat2label;
 
-      // ── APPROACH CARDS ──
-      const apCards = document.querySelectorAll('.approach-card');
-      ['approach1','approach2','approach3'].forEach((key, i) => {
-        if (d[key] && apCards[i]) {
-          if (d[key].title) apCards[i].querySelector('.approach-title').textContent = d[key].title;
-          if (d[key].text)  apCards[i].querySelector('.approach-text').textContent  = d[key].text;
+      // ── APPROACH CARDS — rebuild from array ──
+      if (d.approaches && d.approaches.length) {
+        const grid = document.querySelector('.approach-grid');
+        if (grid) {
+          const delays = ['delay-1','delay-2','delay-3','delay-4'];
+          grid.innerHTML = d.approaches.map((a, i) => `
+            <div class="approach-card glass reveal ${delays[i]||'delay-3'}">
+              <span class="approach-icon">${a.icon||'⚡'}</span>
+              <h3 class="approach-title">${a.title||''}</h3>
+              <p class="approach-text">${a.text||''}</p>
+            </div>`).join('');
+          document.querySelectorAll('.approach-card.reveal').forEach(el => observer.observe(el));
         }
-      });
+      }
+
+      // ── BOTS PANEL — rebuild from array ──
+      if (d.bots && d.bots.length) {
+        const list = document.querySelector('.bots-list');
+        if (list) {
+          list.innerHTML = d.bots.map((b, i) => {
+            const isLive = b.badge === 'live';
+            const clickable = isLive ? `onclick="openBotSim()" style="cursor:pointer"` : `style="opacity:0.5;pointer-events:none"`;
+            return `<div class="bot-card" ${clickable}>
+              <div class="bot-card-icon">${b.icon||'🤖'}</div>
+              <div class="bot-card-info">
+                <div class="bot-card-name">${b.name||'Bot'}</div>
+                <div class="bot-card-desc">${b.desc||''}</div>
+              </div>
+              <span class="bot-card-badge ${isLive?'badge-live':'badge-soon'}">${isLive?'Live':'Soon'}</span>
+              <div class="bot-card-action" style="${!isLive?'opacity:0.3':''}">→</div>
+            </div>`;
+          }).join('');
+        }
+      }
 
       // ── CONTACT ──
-      if (d.contactTitle) document.querySelector('.contact-title').textContent = d.contactTitle;
-      if (d.contactSub)   document.querySelector('.contact-sub').textContent   = d.contactSub;
+      if (d.contactTitle) { const el = document.querySelector('.contact-title'); if(el) el.textContent = d.contactTitle; }
+      if (d.contactSub)   { const el = document.querySelector('.contact-sub');   if(el) el.textContent = d.contactSub; }
+      if (d.contactEmail) { const el = document.querySelector('a[href^="mailto"]'); if(el) el.href = 'mailto:' + d.contactEmail; }
+      if (d.socialGithub)   { const el = document.querySelector('a[href*="github"]');   if(el) el.href = d.socialGithub; }
+      if (d.socialLinkedin) { const el = document.querySelector('a[href*="linkedin"]'); if(el) el.href = d.socialLinkedin; }
+      if (d.socialWhatsapp) {
+        const els = document.querySelectorAll('a[href*="wa.me"]');
+        els.forEach(el => el.href = 'https://wa.me/' + d.socialWhatsapp);
+      }
 
       // ── FOOTER ──
-      if (d.footer) document.querySelector('footer p').innerHTML = d.footer + ' · <span id="year"></span>';
+      if (d.footer) {
+        const el = document.querySelector('footer p');
+        if (el) el.innerHTML = d.footer + ' · <span id="year">' + new Date().getFullYear() + '</span>';
+      }
+
+      // ── STACK BADGES — rebuild from array ──
+      if (d.stackBadges && d.stackBadges.length) {
+        const grid = document.querySelector('.stack-grid');
+        if (grid) {
+          grid.innerHTML = d.stackBadges.map(b =>
+            `<span class="stack-badge"><span class="badge-icon">${b.icon||'⚡'}</span> ${b.label||''}</span>`
+          ).join('');
+        }
+      }
 
     } catch(e) {
       console.warn('Firebase load failed:', e.message);
