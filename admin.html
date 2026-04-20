@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Admin — مرتضى Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--gold:#C9A84C;--gold-dim:rgba(201,168,76,0.15);--bg:#060608;--bg2:#0d0d12;--card:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.08);--text:#F0EAD6;--text-dim:rgba(240,234,214,0.5);--green:#25d366;--red:#ff5f57}
+body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh;padding:0}
+
+/* ── LOGIN ── */
+#login-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999}
+.login-box{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:48px 40px;width:360px;text-align:center}
+.login-logo{font-size:32px;margin-bottom:12px}
+.login-title{font-size:20px;font-weight:700;color:var(--gold);margin-bottom:6px}
+.login-sub{font-size:12px;color:var(--text-dim);margin-bottom:32px;letter-spacing:0.05em}
+.login-input{width:100%;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:10px;padding:12px 16px;color:var(--text);font-size:14px;font-family:'Syne',sans-serif;outline:none;margin-bottom:12px;transition:border-color 0.2s}
+.login-input:focus{border-color:var(--gold)}
+.login-btn{width:100%;background:linear-gradient(135deg,var(--gold),#a8882d);border:none;border-radius:10px;padding:13px;color:#0a0800;font-weight:700;font-size:14px;font-family:'Syne',sans-serif;cursor:pointer;transition:opacity 0.2s}
+.login-btn:hover{opacity:0.85}
+.login-error{color:var(--red);font-size:12px;margin-top:10px;display:none}
+
+/* ── LAYOUT ── */
+#admin-app{display:none;min-height:100vh}
+.admin-header{background:rgba(255,255,255,0.03);border-bottom:1px solid var(--border);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(20px)}
+.admin-brand{display:flex;align-items:center;gap:12px}
+.admin-brand-icon{width:36px;height:36px;border-radius:10px;background:var(--gold-dim);border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:16px}
+.admin-brand-name{font-size:15px;font-weight:700;color:var(--text)}
+.admin-brand-sub{font-size:11px;color:var(--text-dim)}
+.header-actions{display:flex;align-items:center;gap:10px}
+.btn-save{background:linear-gradient(135deg,var(--gold),#a8882d);border:none;border-radius:10px;padding:10px 24px;color:#0a0800;font-weight:700;font-size:13px;font-family:'Syne',sans-serif;cursor:pointer;transition:opacity 0.2s;display:flex;align-items:center;gap:8px}
+.btn-save:hover{opacity:0.85}
+.btn-save:disabled{opacity:0.4;cursor:not-allowed}
+.btn-logout{background:transparent;border:1px solid var(--border);border-radius:10px;padding:10px 16px;color:var(--text-dim);font-size:12px;font-family:'Syne',sans-serif;cursor:pointer;transition:all 0.2s}
+.btn-logout:hover{border-color:var(--red);color:var(--red)}
+.save-status{font-size:12px;color:var(--text-dim);opacity:0;transition:opacity 0.3s}
+.save-status.show{opacity:1}
+.save-status.ok{color:var(--green)}
+.save-status.err{color:var(--red)}
+
+/* ── CONTENT ── */
+.admin-body{max-width:900px;margin:0 auto;padding:40px 32px}
+.section-block{margin-bottom:40px}
+.section-head{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.section-icon{font-size:20px}
+.section-name{font-size:16px;font-weight:700;color:var(--text)}
+.section-desc{font-size:12px;color:var(--text-dim)}
+.fields-grid{display:grid;gap:16px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field-label{font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);font-weight:600}
+.field-input{background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-size:14px;font-family:'Syne',sans-serif;outline:none;transition:border-color 0.2s;resize:none;line-height:1.5}
+.field-input:focus{border-color:var(--gold);background:rgba(255,255,255,0.07)}
+.two-col{grid-template-columns:1fr 1fr}
+.three-col{grid-template-columns:1fr 1fr 1fr}
+.project-block{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:14px}
+.project-num{font-size:11px;letter-spacing:0.1em;color:var(--gold);font-weight:700;margin-bottom:14px;text-transform:uppercase}
+.toast{position:fixed;bottom:32px;right:32px;background:rgba(37,211,102,0.15);border:1px solid rgba(37,211,102,0.3);color:var(--green);padding:12px 20px;border-radius:12px;font-size:13px;font-family:'Syne',sans-serif;transform:translateY(20px);opacity:0;transition:all 0.3s;pointer-events:none;z-index:9999}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.err{background:rgba(255,95,87,0.15);border-color:rgba(255,95,87,0.3);color:var(--red)}
+@media(max-width:600px){.two-col,.three-col{grid-template-columns:1fr}.admin-body{padding:24px 16px}.admin-header{padding:12px 16px}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">🔐</div>
+    <div class="login-title">Portfolio Admin</div>
+    <div class="login-sub">PRIVATE — مرتضى only</div>
+    <input class="login-input" id="loginPass" type="password" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()"/>
+    <button class="login-btn" onclick="doLogin()">Enter</button>
+    <div class="login-error" id="loginError">Wrong password</div>
+  </div>
+</div>
+
+<!-- ADMIN APP -->
+<div id="admin-app">
+  <div class="admin-header">
+    <div class="admin-brand">
+      <div class="admin-brand-icon">⚡</div>
+      <div>
+        <div class="admin-brand-name">Portfolio Admin</div>
+        <div class="admin-brand-sub">Edit · Save · Goes live instantly</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <span class="save-status" id="saveStatus"></span>
+      <button class="btn-save" id="saveBtn" onclick="saveAll()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Save & Publish
+      </button>
+      <button class="btn-logout" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="admin-body">
+
+    <!-- HERO -->
+    <div class="section-block">
+      <div class="section-head">
+        <span class="section-icon">🦸</span>
+        <div>
+          <div class="section-name">Hero Section</div>
+          <div class="section-desc">Top of the page — first thing visitors see</div>
+        </div>
+      </div>
+      <div class="fields-grid">
+        <div class="field">
+          <div class="field-label">Eyebrow Tag (small text above title)</div>
+          <input class="field-input" id="heroEyebrow" type="text" placeholder="Available for new projects"/>
+        </div>
+        <div class="fields-grid two-col">
+          <div class="field">
+            <div class="field-label">Title Line 1</div>
+            <input class="field-input" id="heroLine1" type="text" placeholder="I build things"/>
+          </div>
+          <div class="field">
+            <div class="field-label">Title Line 2</div>
+            <input class="field-input" id="heroLine2" type="text" placeholder="that &lt;em&gt;work.&lt;/em&gt;"/>
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label">Subtitle paragraph</div>
+          <textarea class="field-input" id="heroSub" rows="2" placeholder="I build smart bots and websites..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- WORK CARDS -->
+    <div class="section-block">
+      <div class="section-head">
+        <span class="section-icon">💼</span>
+        <div>
+          <div class="section-name">Work / Projects</div>
+          <div class="section-desc">The 4 project cards in the Work section</div>
+        </div>
+      </div>
+      <div id="projectsWrap">
+        <!-- generated by JS -->
+      </div>
+    </div>
+
+    <!-- ABOUT -->
+    <div class="section-block">
+      <div class="section-head">
+        <span class="section-icon">👤</span>
+        <div>
+          <div class="section-name">About Section</div>
+          <div class="section-desc">Your bio — English and Arabic</div>
+        </div>
+      </div>
+      <div class="fields-grid">
+        <div class="field">
+          <div class="field-label">English Bio</div>
+          <textarea class="field-input" id="aboutEN" rows="3" placeholder="I'm based in Iraq..."></textarea>
+        </div>
+        <div class="field">
+          <div class="field-label">Arabic Bio</div>
+          <textarea class="field-input" id="aboutAR" rows="3" placeholder="أعمل من قلب العراق..."></textarea>
+        </div>
+        <div class="fields-grid two-col">
+          <div class="field">
+            <div class="field-label">Stat 1 — Number</div>
+            <input class="field-input" id="stat1num" type="text" placeholder="3+"/>
+          </div>
+          <div class="field">
+            <div class="field-label">Stat 1 — Label</div>
+            <input class="field-input" id="stat1label" type="text" placeholder="Projects Shipped"/>
+          </div>
+          <div class="field">
+            <div class="field-label">Stat 2 — Number</div>
+            <input class="field-input" id="stat2num" type="text" placeholder="1"/>
+          </div>
+          <div class="field">
+            <div class="field-label">Stat 2 — Label</div>
+            <input class="field-input" id="stat2label" type="text" placeholder="AI Bot Built"/>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- APPROACH -->
+    <div class="section-block">
+      <div class="section-head">
+        <span class="section-icon">🧠</span>
+        <div>
+          <div class="section-name">Approach Cards</div>
+          <div class="section-desc">The 3 "how I work" cards</div>
+        </div>
+      </div>
+      <div id="approachWrap">
+        <!-- generated by JS -->
+      </div>
+    </div>
+
+    <!-- CONTACT -->
+    <div class="section-block">
+      <div class="section-head">
+        <span class="section-icon">📬</span>
+        <div>
+          <div class="section-name">Contact Section</div>
+          <div class="section-desc">Bottom contact card text</div>
+        </div>
+      </div>
+      <div class="fields-grid">
+        <div class="field">
+          <div class="field-label">Contact Title</div>
+          <input class="field-input" id="contactTitle" type="text" placeholder="Let's build something great"/>
+        </div>
+        <div class="field">
+          <div class="field-label">Contact Subtitle</div>
+          <textarea class="field-input" id="contactSub" rows="2" placeholder="Have a project in mind?..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="section-block">
+      <div class="section-head">
+        <span class="section-icon">🔻</span>
+        <div>
+          <div class="section-name">Footer</div>
+          <div class="section-desc">Bottom line text (year auto-appended)</div>
+        </div>
+      </div>
+      <div class="field">
+        <div class="field-label">Footer Text</div>
+        <input class="field-input" id="footer" type="text" placeholder="Built with obsession · Karbala, Iraq ·"/>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+  import { initializeApp }                           from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, doc, getDoc, setDoc }       from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  // 🔧 PASTE YOUR FIREBASE CONFIG HERE (same as in index.html)
+    const firebaseConfig = {
+  apiKey: "AIzaSyDer0I6uU2Q2HPBTpkDMZnFzeiVYBRjWg8",
+  authDomain: "my-portfolio-da5f2.firebaseapp.com",
+  projectId: "my-portfolio-da5f2",
+  storageBucket: "my-portfolio-da5f2.firebasestorage.app",
+  messagingSenderId: "425746037669",
+  appId: "1:425746037669:web:e1464f1ac4cfcb4e02864c",
+  measurementId: "G-4X8E9PC11W"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getFirestore(app);
+
+  // ── PASSWORD (change this to whatever you want) ──
+  const ADMIN_PASSWORD = "mortadha2024";
+
+  // ── PROJECT CARDS ──
+  const projects = [
+    { key:'project1', num:'01', defaultTag:'AI · WhatsApp Bot',   defaultTitle:'Alamani Smart Bot',            defaultDesc:'AI-powered WhatsApp sales bot for an electronics store in Karbala.' },
+    { key:'project2', num:'02', defaultTag:'Web · Full Stack',     defaultTitle:'Restaurant Management POS',    defaultDesc:'Describe your second project here.' },
+    { key:'project3', num:'03', defaultTag:'Web · Full Stack',     defaultTitle:'Barber Management Dashboard',  defaultDesc:'Describe your third project here.' },
+    { key:'project4', num:'04', defaultTag:'Web · Design',         defaultTitle:'RealEstate — العقار',          defaultDesc:'Another project slot.' },
+  ];
+  const approaches = [
+    { key:'approach1', defaultTitle:'AI where it matters', defaultText:'I use AI to solve real problems — not to look impressive.' },
+    { key:'approach2', defaultTitle:'Built to work',       defaultText:'Pretty is useless if it breaks. Everything I build is tested and reliable.' },
+    { key:'approach3', defaultTitle:'Direct communication',defaultText:'No corporate speak. Honest, always.' },
+  ];
+
+  // Build project fields
+  const pw = document.getElementById('projectsWrap');
+  projects.forEach(p => {
+    pw.innerHTML += `
+      <div class="project-block">
+        <div class="project-num">Project ${p.num}</div>
+        <div class="fields-grid">
+          <div class="fields-grid two-col">
+            <div class="field"><div class="field-label">Tag</div><input class="field-input" id="${p.key}_tag" type="text" placeholder="${p.defaultTag}"/></div>
+            <div class="field"><div class="field-label">Title</div><input class="field-input" id="${p.key}_title" type="text" placeholder="${p.defaultTitle}"/></div>
+          </div>
+          <div class="field"><div class="field-label">Description</div><textarea class="field-input" id="${p.key}_desc" rows="2" placeholder="${p.defaultDesc}"></textarea></div>
+        </div>
+      </div>`;
+  });
+
+  // Build approach fields
+  const aw = document.getElementById('approachWrap');
+  approaches.forEach((a,i) => {
+    aw.innerHTML += `
+      <div class="project-block">
+        <div class="project-num">Card ${i+1}</div>
+        <div class="fields-grid two-col">
+          <div class="field"><div class="field-label">Title</div><input class="field-input" id="${a.key}_title" type="text" placeholder="${a.defaultTitle}"/></div>
+          <div class="field"><div class="field-label">Text</div><input class="field-input" id="${a.key}_text" type="text" placeholder="${a.defaultText}"/></div>
+        </div>
+      </div>`;
+  });
+
+  // ── LOGIN ──
+  window.doLogin = function() {
+    const pass = document.getElementById('loginPass').value;
+    if (pass === ADMIN_PASSWORD) {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('admin-app').style.display = 'block';
+      loadData();
+    } else {
+      document.getElementById('loginError').style.display = 'block';
+      document.getElementById('loginPass').value = '';
+    }
+  };
+
+  window.logout = function() {
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('admin-app').style.display = 'none';
+  };
+
+  // ── LOAD ──
+  async function loadData() {
+    try {
+      const snap = await getDoc(doc(db, "portfolio", "content"));
+      if (!snap.exists()) return;
+      const d = snap.data();
+
+      const set = (id, val) => { if(val !== undefined){ const el = document.getElementById(id); if(el) el.value = val; }};
+
+      set('heroEyebrow', d.heroEyebrow);
+      set('heroLine1',   d.heroLine1);
+      set('heroLine2',   d.heroLine2);
+      set('heroSub',     d.heroSub);
+      set('aboutEN',     d.aboutEN);
+      set('aboutAR',     d.aboutAR);
+      set('stat1num',    d.stat1num);
+      set('stat1label',  d.stat1label);
+      set('stat2num',    d.stat2num);
+      set('stat2label',  d.stat2label);
+      set('contactTitle',d.contactTitle);
+      set('contactSub',  d.contactSub);
+      set('footer',      d.footer);
+
+      projects.forEach(p => {
+        if (d[p.key]) {
+          set(p.key+'_tag',   d[p.key].tag);
+          set(p.key+'_title', d[p.key].title);
+          set(p.key+'_desc',  d[p.key].desc);
+        }
+      });
+      approaches.forEach(a => {
+        if (d[a.key]) {
+          set(a.key+'_title', d[a.key].title);
+          set(a.key+'_text',  d[a.key].text);
+        }
+      });
+
+      showToast('Loaded current content ✓', false);
+    } catch(e) {
+      showToast('Load failed: ' + e.message, true);
+    }
+  }
+
+  // ── SAVE ──
+  window.saveAll = async function() {
+    const btn = document.getElementById('saveBtn');
+    btn.disabled = true;
+    btn.textContent = 'Saving...';
+
+    const get = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+
+    const data = {
+      heroEyebrow:  get('heroEyebrow'),
+      heroLine1:    get('heroLine1'),
+      heroLine2:    get('heroLine2'),
+      heroSub:      get('heroSub'),
+      aboutEN:      get('aboutEN'),
+      aboutAR:      get('aboutAR'),
+      stat1num:     get('stat1num'),
+      stat1label:   get('stat1label'),
+      stat2num:     get('stat2num'),
+      stat2label:   get('stat2label'),
+      contactTitle: get('contactTitle'),
+      contactSub:   get('contactSub'),
+      footer:       get('footer'),
+    };
+
+    projects.forEach(p => {
+      data[p.key] = { tag: get(p.key+'_tag'), title: get(p.key+'_title'), desc: get(p.key+'_desc') };
+    });
+    approaches.forEach(a => {
+      data[a.key] = { title: get(a.key+'_title'), text: get(a.key+'_text') };
+    });
+
+    try {
+      await setDoc(doc(db, "portfolio", "content"), data);
+      showToast('✅ Saved & live instantly!', false);
+    } catch(e) {
+      showToast('❌ Save failed: ' + e.message, true);
+    }
+
+    btn.disabled = false;
+    btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save & Publish`;
+  };
+
+  function showToast(msg, isErr) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast show' + (isErr ? ' err' : '');
+    setTimeout(() => t.className = 'toast', 3000);
+  }
+</script>
+</body>
+</html>

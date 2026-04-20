@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Alamani Bot Simulator</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;background:#0b141a;overflow:hidden}
+#sim-wrap{width:100%;height:100%;background:#0b141a;display:flex;flex-direction:column}
+.sw-header{background:#1f2c34;padding:14px 18px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.sw-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#25d366,#128c7e);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.sw-hname{color:#e9edef;font-size:14px;font-weight:600;font-family:'Syne',sans-serif}
+.sw-hstatus{color:#8696a0;font-size:11px;font-family:'Syne',sans-serif}
+.sw-body{flex:1;overflow-y:auto;padding:14px;background:#0b141a;scroll-behavior:smooth}
+.sw-body::-webkit-scrollbar{width:3px}
+.sw-body::-webkit-scrollbar-thumb{background:#2a3942;border-radius:2px}
+.sw-date{text-align:center;margin:8px 0}
+.sw-date span{background:#1f2c34;color:#8696a0;font-size:11px;padding:3px 12px;border-radius:100px;font-family:'Syne',sans-serif}
+.sw-msg{margin-bottom:6px;display:flex;flex-direction:column}
+.sw-msg.user{align-items:flex-end}
+.sw-msg.bot{align-items:flex-start}
+.sw-bubble{max-width:80%;padding:8px 13px 6px;border-radius:9px;font-size:14px;line-height:1.55;word-wrap:break-word;white-space:pre-wrap;font-family:'Syne',sans-serif}
+.sw-msg.user .sw-bubble{background:#005c4b;color:#e9edef;border-top-right-radius:2px}
+.sw-msg.bot .sw-bubble{background:#1f2c34;color:#e9edef;border-top-left-radius:2px}
+.sw-time{font-size:10px;color:#8696a0;margin-top:2px;padding:0 4px;font-family:'Syne',sans-serif}
+.sw-typing{background:#1f2c34;border-radius:9px;border-top-left-radius:2px;padding:11px 15px;display:inline-flex;gap:5px;align-items:center}
+.sw-dot{width:7px;height:7px;border-radius:50%;background:#8696a0;animation:swB 1.2s infinite}
+.sw-dot:nth-child(2){animation-delay:.2s}
+.sw-dot:nth-child(3){animation-delay:.4s}
+@keyframes swB{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+.sw-footer{background:#1f2c34;padding:10px 12px;flex-shrink:0}
+.sw-irow{display:flex;align-items:center;gap:9px}
+.sw-input{flex:1;background:#2a3942;border:none;border-radius:24px;padding:10px 16px;color:#e9edef;font-size:14px;outline:none;font-family:'Syne',sans-serif}
+.sw-input::placeholder{color:#8696a0}
+.sw-input:disabled{opacity:0.5}
+.sw-send{width:42px;height:42px;border-radius:50%;background:#00a884;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background 0.2s}
+.sw-send:hover{background:#06cf9c}
+.sw-send:disabled{background:#2a3942;cursor:not-allowed}
+.sw-qbtns{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.sw-qbtn{background:rgba(0,168,132,0.12);border:1px solid rgba(0,168,132,0.35);color:#00a884;font-size:12px;padding:5px 13px;border-radius:100px;cursor:pointer;font-family:'Syne',sans-serif;transition:all 0.2s;white-space:nowrap}
+.sw-qbtn:hover{background:rgba(0,168,132,0.22)}
+.sw-qbtn:disabled{opacity:0.35;cursor:not-allowed}
+.sw-demo-badge{text-align:center;font-size:11px;color:rgba(201,168,76,0.6);letter-spacing:0.04em;padding:5px 0 7px;border-bottom:1px solid rgba(255,255,255,0.05);margin-bottom:8px;font-family:'Syne',sans-serif}
+.sw-reset{width:100%;margin-top:7px;background:transparent;border:1px solid #2a3942;color:#8696a0;font-size:11px;padding:5px;border-radius:8px;cursor:pointer;font-family:'Syne',sans-serif;transition:all 0.2s}
+.sw-reset:hover{border-color:#8696a0;color:#e9edef}
+.sw-pcard{background:#0d1b22;border-radius:8px;padding:8px 10px;margin-top:5px;border-left:3px solid #25d366}
+.sw-pname{color:#e9edef;font-size:13px;font-weight:600;font-family:'Syne',sans-serif}
+.sw-pprice{color:#25d366;font-size:12px;margin-top:2px;font-family:'Syne',sans-serif}
+.sw-plink{color:#00a884;font-size:11px;margin-top:2px;font-family:'Syne',sans-serif}
+.sw-ocard{background:#0d1b22;border-radius:8px;padding:10px 12px;margin-top:5px;border-left:3px solid #f59e0b}
+.sw-otitle{color:#f59e0b;font-size:12px;font-weight:700;margin-bottom:5px;font-family:'Syne',sans-serif}
+.sw-orow{color:#e9edef;font-size:12px;margin:3px 0;font-family:'Syne',sans-serif}
+.sw-odone{color:#25d366;font-size:12px;font-weight:600;margin-top:6px;font-family:'Syne',sans-serif}
+</style>
+</head>
+<body>
+<div id="sim-wrap">
+  <div class="sw-header">
+    <div class="sw-avatar">🛍️</div>
+    <div>
+      <div class="sw-hname">الاماني للإلكترونيات</div>
+      <div class="sw-hstatus" id="swStatus">متصل</div>
+    </div>
+  </div>
+  <div class="sw-body" id="swBody">
+    <div class="sw-date"><span>اليوم</span></div>
+    <div class="sw-msg bot">
+      <div class="sw-bubble">هلا بيك ستاذ وبكل أهل سوق الأماني 🛍️✨ شنو أگدر أساعدك؟ تگدر تختار من الأسئلة الجاهزة الجوة حتى تشوف الالية او كلة يسويلك شريك خاص بيك</div>
+      <div class="sw-time">9:00 ص</div>
+    </div>
+  </div>
+  <div class="sw-footer">
+    <div class="sw-demo-badge">🎮 تجربة تفاعلية — هذا محاكي للعرض فقط</div>
+    <div class="sw-irow">
+      <input class="sw-input" id="swInput" placeholder="اكتب رسالة أو اضغط زر 👇"/>
+      <button class="sw-send" id="swSend" onclick="swSendMsg()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      </button>
+    </div>
+    <div class="sw-qbtns" id="swQbtns">
+      <button class="sw-qbtn" onclick="swQ('يشتغل مع گوگل شيت.البيان او اكسل؟')">يشتغل مع گوگل شيت.البيان اواكسل؟</button>
+      <button class="sw-qbtn" onclick="swQ('اريد😢')">اريد😢</button>
+      <button class="sw-qbtn" onclick="swQ('بلة بشنو يفيدني؟')">بلة بشنو يفيدني؟</button>
+      <button class="sw-qbtn" onclick="swQ('شكد يكلف ؟')">شكد يكلف ؟</button>
+      <button class="sw-qbtn" onclick="swQ('اريد جهاز ع كد فلوسي لان معندي😢')">اريد جهاز ع كد فلوسي لان معندي😢</button>
+
+    </div>
+    <button class="sw-reset" onclick="swReset()">↺ محادثة جديدة</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  let busy=false, stage=null, cdata={}, mins=9*60;
+
+  function t(){const h=Math.floor(mins/60),m=mins%60;mins++;return`${h>12?h-12:h}:${m.toString().padStart(2,'0')} ${h<12?'ص':'م'}`}
+
+  function addMsg(txt,who,isHTML){
+    const body=document.getElementById('swBody');
+    const d=document.createElement('div');d.className='sw-msg '+who;
+    const b=document.createElement('div');b.className='sw-bubble';
+    if(isHTML)b.innerHTML=txt;else b.textContent=txt;
+    const tm=document.createElement('div');tm.className='sw-time';
+    tm.textContent=t()+(who==='user'?' ✓✓':'');
+    d.appendChild(b);d.appendChild(tm);
+    body.appendChild(d);body.scrollTop=body.scrollHeight;
+  }
+
+  function typingOn(){
+    const body=document.getElementById('swBody');
+    const d=document.createElement('div');d.className='sw-msg bot';d.id='swTyping';
+    d.innerHTML='<div class="sw-typing"><div class="sw-dot"></div><div class="sw-dot"></div><div class="sw-dot"></div></div>';
+    body.appendChild(d);body.scrollTop=body.scrollHeight;
+    document.getElementById('swStatus').textContent='يكتب...';
+  }
+  function typingOff(){const t=document.getElementById('swTyping');if(t)t.remove();document.getElementById('swStatus').textContent='متصل';}
+  function lock(v){document.querySelectorAll('.sw-qbtn').forEach(b=>b.disabled=v);const inp=document.getElementById('swInput');if(inp)inp.disabled=v;}
+
+  function pcards(arr,path){
+    path=path||'mobile';
+    return arr.map(p=>`<div class="sw-pcard"><div class="sw-pname">📦 ${p.n}</div><div class="sw-pprice">💰 ${p.p} د.ع</div><div class="sw-plink">🔗 alamani.iq/${path}/card/${p.id}</div></div>`).join('');
+  }
+
+  function reply(txt){
+    const tl=txt.toLowerCase().trim();
+
+    if(stage==='name'){cdata.name=txt;stage='phone';return{r:`شكراً ${txt}! 😊\nهسة أحتاج رقم هاتفك 📱`,h:false};}
+    if(stage==='phone'){cdata.phone=txt;stage='area';return{r:'ممتاز! آخر شي — منطقتك؟ 🏠',h:false};}
+    if(stage==='area'){
+      const n=cdata.name,p=cdata.phone;stage=null;cdata={};
+      return{r:`<div class="sw-ocard"><div class="sw-otitle">✅ تم استلام طلبك!</div><div class="sw-orow">👤 ${n}</div><div class="sw-orow">📱 ${p}</div><div class="sw-orow">🏠 ${txt}</div><div class="sw-odone">نتواصل معك خلال ساعة ✨</div></div>`,h:true};
+    }
+
+    if(tl.includes('گوگل شيت')||tl.includes('شيت'))
+      return{r:'أي يشتغل مع گوگل شيت مباشرة! 📊\n\nالطلب يسجل تلقائياً بالشيت (الاسم، الهاتف، المنطقة، الجهاز)، وتجيك إشعار فوري. والأحلى إنو البوت يقرأ من الشيت، يعني لو حدّثت أسعارك، البوت يعرف تلقائياً! 😉',h:false};
+
+    if(tl.includes('فلوسي'))
+      return{r:'شكد فلوسك بلة؟ لتخاف كلشي عدنا! 💰 بس كولي الميزانية وبشر، نطلعلك أحلى جهاز يلوگ ليدك ويناسب جيبك. 😉',h:false};
+
+    if(tl==='اريد😢'||tl==='اريد'||tl.includes('نظام خاص'))
+      return{r:'تمام! 😂 أكدر أسويلك نظام خاص بيك وبشغلك. بس كولي شوية عن مشروعك: شنو تبيع؟ وين تريد البوت (واتساب لو موقع)؟ وعندك قائمة منتجات هسة؟ 💪',h:false};
+
+    if(tl.includes('يفيدني'))
+      return{r:'هذا مو بس يرد — هذا موظف شايل شغلك كله 24 ساعة 😄:\n✅ يسولف وي الزبائن بلهجتنا.\n✅ ذكي وعنده شخصية "ابن سوق".\n✅ أبو الفزعات: ينصح ويقترح الأفضل.\n✅ يعرف الميزانية: يطلع غراض على كد الفلوس.\n✅ يثبت الطلبات بلمحة بصر.\n\nباختصار — أنت تذب حملك وتنام، والبوت هو اليحرث بالسوق 🌙',h:false};
+
+    if(tl.includes('يكلف')||tl.includes('سعر'))
+      return{r:'التكلفة تعتمد على حجم مشروعك؛ إذا كان عندك موقع أو تطبيق، أو إذا تريد نربطه بأكثر من برنامج. بس بصورة عامة، نسويلك شي يناسب ميزانيتك! 💰',h:false};
+
+    if(tl.includes('اشتري')||tl.includes('أشتري')){
+      stage='name';
+      return{r:'تمام😂، أكدر أسويلك نظام خاص بيك وبشغلك\nبس كولي شوية عن مشروعك:\n\nأول شي — شو اسمك؟',h:false};
+
+    }
+
+    return{r:'تمام😂، أكدر أسويلك نظام خاص بيك وبشغلك بس كولي شوية عن مشروعك',h:false};
+  }
+
+  function process(txt){
+    if(busy||!txt.trim())return;
+    busy=true;lock(true);
+    addMsg(txt,'user');
+    const inp=document.getElementById('swInput');
+    if(inp)inp.value='';
+    const delay=1400+Math.random()*800;
+    setTimeout(()=>typingOn(),250);
+    setTimeout(()=>{
+      typingOff();
+      const{r,h}=reply(txt);
+      addMsg(r,'bot',h);
+      const body=document.getElementById('swBody');
+      if(body)body.scrollTop=body.scrollHeight;
+      busy=false;lock(false);
+    },delay);
+  }
+
+  window.swSendMsg=()=>{const inp=document.getElementById('swInput');if(inp)process(inp.value);};
+  window.swQ=txt=>process(txt);
+
+  window.swReset=()=>{
+    const body=document.getElementById('swBody');
+    if(body)body.innerHTML='<div class="sw-date"><span>اليوم</span></div>';
+    stage=null;cdata={};busy=false;mins=9*60;
+    addMsg('هلاً بيك بسوق الاماني! 🛍️✨\n\nأني مرتضى، شلون أقدر أساعدك اليوم؟ 😊','bot');
+    lock(false);
+  };
+
+  document.getElementById('swInput').addEventListener('keydown',e=>{if(e.key==='Enter')window.swSendMsg();});
+})();
+</script>
+</body>
+</html>
