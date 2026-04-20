@@ -243,7 +243,7 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
 
   // 🔧 PASTE YOUR FIREBASE CONFIG HERE (same as in index.html)
     const firebaseConfig = {
-  apiKey: "AIzaSyDer0I6uU2Q2HPBTpkDMZnFzeiVYBRjWg8",
+  apiKey: process.env.FIREBASE_API_KEY,
   authDomain: "my-portfolio-da5f2.firebaseapp.com",
   projectId: "my-portfolio-da5f2",
   storageBucket: "my-portfolio-da5f2.firebasestorage.app",
