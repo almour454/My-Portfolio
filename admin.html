@@ -70,8 +70,8 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
     <div class="login-logo">🔐</div>
     <div class="login-title">Portfolio Admin</div>
     <div class="login-sub">PRIVATE — مرتضى only</div>
-    <input class="login-input" id="loginPass" type="password" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()"/>
-    <button class="login-btn" onclick="doLogin()">Enter</button>
+    <input class="login-input" id="loginPass" type="password" placeholder="Password"/>
+    <button class="login-btn" id="loginBtn">Enter</button>
     <div class="login-error" id="loginError">Wrong password</div>
   </div>
 </div>
@@ -88,11 +88,11 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
     </div>
     <div class="header-actions">
       <span class="save-status" id="saveStatus"></span>
-      <button class="btn-save" id="saveBtn" onclick="saveAll()">
+      <button class="btn-save" id="saveBtn">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
         Save & Publish
       </button>
-      <button class="btn-logout" onclick="logout()">Logout</button>
+      <button class="btn-logout" id="logoutBtn">Logout</button>
     </div>
   </div>
 
@@ -243,7 +243,7 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
 
   // 🔧 PASTE YOUR FIREBASE CONFIG HERE (same as in index.html)
     const firebaseConfig = {
-  apiKey: process.env.FIREBASE_API_KEY,
+  apiKey: "AIzaSyDer0I6uU2Q2HPBTpkDMZnFzeiVYBRjWg8",
   authDomain: "my-portfolio-da5f2.firebaseapp.com",
   projectId: "my-portfolio-da5f2",
   storageBucket: "my-portfolio-da5f2.firebasestorage.app",
@@ -256,7 +256,7 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
   const db  = getFirestore(app);
 
   // ── PASSWORD (change this to whatever you want) ──
-  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;  // ── PROJECT CARDS ──
+  const ADMIN_PASSWORD = "mortadha2024"; // ── Change this password to whatever you want ──
   const projects = [
     { key:'project1', num:'01', defaultTag:'AI · WhatsApp Bot',   defaultTitle:'Alamani Smart Bot',            defaultDesc:'AI-powered WhatsApp sales bot for an electronics store in Karbala.' },
     { key:'project2', num:'02', defaultTag:'Web · Full Stack',     defaultTitle:'Restaurant Management POS',    defaultDesc:'Describe your second project here.' },
@@ -407,6 +407,12 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
     t.className = 'toast show' + (isErr ? ' err' : '');
     setTimeout(() => t.className = 'toast', 3000);
   }
+
+  // ── WIRE UP BUTTONS (inside module so they have access to all functions) ──
+  document.getElementById('loginBtn').addEventListener('click', doLogin);
+  document.getElementById('loginPass').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+  document.getElementById('logoutBtn').addEventListener('click', logout);
+  document.getElementById('saveBtn').addEventListener('click', saveAll);
 </script>
 </body>
 </html>
