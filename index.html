@@ -1115,6 +1115,78 @@ window.addEventListener('mousemove',e=>{const x=(e.clientX/window.innerWidth-0.5
   }
 
   loadContent();
+  
+
+// ── MOBILE TOUCH AURA ──
+(function(){
+  if(!('ontouchstart' in window)) return; // desktop only gets cursor
+  
+  const aura = document.createElement('div');
+  aura.style.cssText = `
+    position:fixed;pointer-events:none;z-index:9999;
+    width:80px;height:80px;border-radius:50%;
+    background:radial-gradient(circle,rgba(201,168,76,0.35),rgba(201,168,76,0.08) 60%,transparent 100%);
+    transform:translate(-50%,-50%);
+    transition:opacity 0.4s ease;
+    opacity:0;
+  `;
+  document.body.appendChild(aura);
+
+  // Trail particles
+  function spawnParticle(x, y){
+    const p = document.createElement('div');
+    const size = Math.random()*6+2;
+    p.style.cssText = `
+      position:fixed;pointer-events:none;z-index:9998;
+      width:${size}px;height:${size}px;border-radius:50%;
+      background:${Math.random()>.6?'#FFD166':'#C9A84C'};
+      left:${x}px;top:${y}px;
+      transform:translate(-50%,-50%);
+      opacity:${Math.random()*0.6+0.2};
+      transition:all 0.8s ease-out;
+    `;
+    document.body.appendChild(p);
+    requestAnimationFrame(()=>{
+      p.style.transform = `translate(${(Math.random()-0.5)*40-50}%,${(Math.random()-0.5)*40-50}%)`;
+      p.style.opacity = '0';
+    });
+    setTimeout(()=>p.remove(), 800);
+  }
+
+  let lastParticle = 0;
+  let fadeTimeout;
+
+  document.addEventListener('touchmove', e=>{
+    const t = e.touches[0];
+    aura.style.left = t.clientX+'px';
+    aura.style.top  = t.clientY+'px';
+    aura.style.opacity = '1';
+    
+    // Spawn particles every 40ms so it doesn't spam
+    const now = Date.now();
+    if(now - lastParticle > 40){
+      spawnParticle(t.clientX, t.clientY);
+      lastParticle = now;
+    }
+    
+    clearTimeout(fadeTimeout);
+    fadeTimeout = setTimeout(()=>{ aura.style.opacity='0'; }, 150);
+  }, {passive:true});
+
+  document.addEventListener('touchstart', e=>{
+    const t = e.touches[0];
+    aura.style.left = t.clientX+'px';
+    aura.style.top  = t.clientY+'px';
+    aura.style.opacity = '1';
+    spawnParticle(t.clientX, t.clientY);
+    spawnParticle(t.clientX, t.clientY);
+  }, {passive:true});
+
+  document.addEventListener('touchend', ()=>{
+    fadeTimeout = setTimeout(()=>{ aura.style.opacity='0'; }, 200);
+  }, {passive:true});
+})();
+
 </script>
 
 </body></html>
