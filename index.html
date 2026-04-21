@@ -1115,76 +1115,47 @@ window.addEventListener('mousemove',e=>{const x=(e.clientX/window.innerWidth-0.5
   }
 
   loadContent();
-  
+
 
 // ── MOBILE TOUCH AURA ──
 (function(){
-  if(!('ontouchstart' in window)) return; // desktop only gets cursor
-  
+  if(!('ontouchstart' in window)) return;
   const aura = document.createElement('div');
-  aura.style.cssText = `
-    position:fixed;pointer-events:none;z-index:9999;
-    width:80px;height:80px;border-radius:50%;
-    background:radial-gradient(circle,rgba(201,168,76,0.35),rgba(201,168,76,0.08) 60%,transparent 100%);
-    transform:translate(-50%,-50%);
-    transition:opacity 0.4s ease;
-    opacity:0;
-  `;
+  const core = document.createElement('div');
+  Object.assign(aura.style,{position:'fixed',width:'90px',height:'90px',borderRadius:'50%',background:'radial-gradient(circle,rgba(201,168,76,0.5) 0%,rgba(201,168,76,0.15) 45%,transparent 70%)',transform:'translate(-50%,-50%) translate3d(-9999px,-9999px,0)',pointerEvents:'none',willChange:'transform',zIndex:'9997'});
+  Object.assign(core.style,{position:'fixed',width:'14px',height:'14px',borderRadius:'50%',background:'rgba(255,209,102,0.9)',boxShadow:'0 0 8px rgba(255,209,102,0.8)',transform:'translate(-50%,-50%) translate3d(-9999px,-9999px,0)',pointerEvents:'none',willChange:'transform',zIndex:'9998'});
   document.body.appendChild(aura);
-
-  // Trail particles
-  function spawnParticle(x, y){
-    const p = document.createElement('div');
-    const size = Math.random()*6+2;
-    p.style.cssText = `
-      position:fixed;pointer-events:none;z-index:9998;
-      width:${size}px;height:${size}px;border-radius:50%;
-      background:${Math.random()>.6?'#FFD166':'#C9A84C'};
-      left:${x}px;top:${y}px;
-      transform:translate(-50%,-50%);
-      opacity:${Math.random()*0.6+0.2};
-      transition:all 0.8s ease-out;
-    `;
-    document.body.appendChild(p);
-    requestAnimationFrame(()=>{
-      p.style.transform = `translate(${(Math.random()-0.5)*40-50}%,${(Math.random()-0.5)*40-50}%)`;
-      p.style.opacity = '0';
-    });
-    setTimeout(()=>p.remove(), 800);
+  document.body.appendChild(core);
+  let lastSpawn=0;
+  function move(x,y){
+    aura.style.transform=`translate(-50%,-50%) translate3d(${x}px,${y}px,0)`;
+    core.style.transform=`translate(-50%,-50%) translate3d(${x}px,${y}px,0)`;
+    const now=performance.now();
+    if(now-lastSpawn>35){spawnParticle(x,y);lastSpawn=now;}
   }
-
-  let lastParticle = 0;
-  let fadeTimeout;
-
-  document.addEventListener('touchmove', e=>{
-    const t = e.touches[0];
-    aura.style.left = t.clientX+'px';
-    aura.style.top  = t.clientY+'px';
-    aura.style.opacity = '1';
-    
-    // Spawn particles every 40ms so it doesn't spam
-    const now = Date.now();
-    if(now - lastParticle > 40){
-      spawnParticle(t.clientX, t.clientY);
-      lastParticle = now;
-    }
-    
-    clearTimeout(fadeTimeout);
-    fadeTimeout = setTimeout(()=>{ aura.style.opacity='0'; }, 150);
-  }, {passive:true});
-
-  document.addEventListener('touchstart', e=>{
-    const t = e.touches[0];
-    aura.style.left = t.clientX+'px';
-    aura.style.top  = t.clientY+'px';
-    aura.style.opacity = '1';
-    spawnParticle(t.clientX, t.clientY);
-    spawnParticle(t.clientX, t.clientY);
-  }, {passive:true});
-
-  document.addEventListener('touchend', ()=>{
-    fadeTimeout = setTimeout(()=>{ aura.style.opacity='0'; }, 200);
-  }, {passive:true});
+  function spawnParticle(x,y){
+    const p=document.createElement('div');
+    const size=Math.random()*5+2;
+    const angle=Math.random()*Math.PI*2;
+    const dist=Math.random()*22+8;
+    const tx=Math.cos(angle)*dist,ty=Math.sin(angle)*dist;
+    Object.assign(p.style,{position:'fixed',width:size+'px',height:size+'px',borderRadius:'50%',background:Math.random()>.5?'rgba(255,209,102,0.85)':'rgba(201,168,76,0.7)',left:x+'px',top:y+'px',transform:'translate(-50%,-50%)',pointerEvents:'none',zIndex:'9996'});
+    document.body.appendChild(p);
+    const start=performance.now(),dur=500+Math.random()*300;
+    function tick(now){const t=Math.min((now-start)/dur,1),e=1-Math.pow(1-t,2);p.style.transform=`translate(-50%,-50%) translate3d(${tx*e}px,${ty*e}px,0)`;p.style.opacity=String((1-t)*0.8);if(t<1)requestAnimationFrame(tick);else p.remove();}
+    requestAnimationFrame(tick);
+  }
+  document.addEventListener('touchstart',e=>{
+    aura.style.opacity='1';core.style.opacity='1';
+    const t=e.touches[0];move(t.clientX,t.clientY);
+    for(let i=0;i<6;i++)spawnParticle(t.clientX,t.clientY);
+  },{passive:true});
+  document.addEventListener('touchmove',e=>{
+    const t=e.touches[0];move(t.clientX,t.clientY);
+  },{passive:true});
+  document.addEventListener('touchend',()=>{
+    let op=1;const fade=()=>{op-=0.08;if(op<=0){aura.style.transform=core.style.transform='translate(-50%,-50%) translate3d(-9999px,-9999px,0)';return;}aura.style.opacity=core.style.opacity=String(op);requestAnimationFrame(fade);};requestAnimationFrame(fade);
+  },{passive:true});
 })();
 
 </script>
