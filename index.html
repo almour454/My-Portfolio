@@ -254,6 +254,41 @@ nav a.active{color:var(--gold)}
 @media(max-width:400px){nav a{padding:6px 10px;font-size:11px}}
 #particles{position:fixed;inset:0;z-index:1;pointer-events:none}
 footer{text-align:center;padding:40px;font-size:12px;color:var(--text-dimmer);letter-spacing:0.1em;z-index:2;position:relative}
+
+/* ══ LOADER ══════════════════════════════════════════ */
+#loader{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:var(--bg);transition:opacity 1.4s cubic-bezier(.4,0,.2,1),transform 1.4s cubic-bezier(.4,0,.2,1);}
+#loader.exit{opacity:0;transform:scale(1.06);pointer-events:none;}
+#loader-stars{position:absolute;inset:0;overflow:hidden;}
+.lstar{position:absolute;border-radius:50%;background:var(--lcol,#c9a84c);animation:ltwinkle var(--d,4s) ease-in-out var(--del,0s) infinite;}
+@keyframes ltwinkle{0%,100%{opacity:var(--op,.3);transform:scale(1);}50%{opacity:1;transform:scale(1.4);}}
+#loader-solar{position:absolute;width:100%;height:100%;pointer-events:none;}
+.lorb{position:absolute;border-radius:50%;filter:blur(var(--blur,70px));animation:lorbDrift var(--spd,20s) ease-in-out var(--del,0s) infinite;pointer-events:none;}
+@keyframes lorbDrift{0%,100%{transform:translate(0,0) scale(1) rotate(0deg);}25%{transform:translate(var(--x1,40px),var(--y1,-50px)) scale(1.08) rotate(8deg);}50%{transform:translate(var(--x2,-30px),var(--y2,35px)) scale(0.94) rotate(-5deg);}75%{transform:translate(var(--x3,20px),var(--y3,20px)) scale(1.04) rotate(4deg);}}
+.lplanet{position:absolute;top:50%;left:50%;width:0;height:0;animation:lplanetOrbit var(--spd,30s) linear var(--del,0s) infinite;transform-origin:0 0;}
+.lplanet::after{content:'';position:absolute;width:var(--sz,5px);height:var(--sz,5px);border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.9) 0%,var(--col,#c9a84c) 55%,transparent 100%);box-shadow:0 0 10px 2px var(--glow,rgba(201,168,76,.7));transform:translate(calc(var(--rx,180px) - 50%),calc(-50%));}
+@keyframes lplanetOrbit{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+.lorbit-line{position:absolute;top:50%;left:50%;border:1px solid rgba(201,168,76,.07);border-radius:50%;transform:translate(-50%,-50%) rotateX(var(--rx,72deg)) rotateZ(var(--rz,0deg));animation:llineBreathe var(--spd,25s) ease-in-out infinite;}
+@keyframes llineBreathe{0%,100%{opacity:.07;transform:translate(-50%,-50%) rotateX(var(--rx,72deg)) rotateZ(var(--rz,0deg)) scale(1);}50%{opacity:.13;transform:translate(-50%,-50%) rotateX(var(--rx,72deg)) rotateZ(var(--rz,0deg)) scale(1.03);}}
+.lcore-glow{position:absolute;border-radius:50%;background:radial-gradient(circle,rgba(255,248,220,.12) 0%,rgba(201,168,76,.06) 40%,transparent 70%);animation:lcoreBreath 3.5s ease-in-out infinite;}
+@keyframes lcoreBreath{0%,100%{transform:scale(1);opacity:.7;}50%{transform:scale(1.12);opacity:1;}}
+#lgreeting-wrap{position:relative;z-index:10;text-align:center;}
+.lgreeting{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);opacity:0;white-space:nowrap;pointer-events:none;}
+.lgreeting.active{animation:lgreetIn .7s cubic-bezier(.16,1,.3,1) forwards;}
+.lgreeting.exit{animation:lgreetOut .5s cubic-bezier(.4,0,1,1) forwards;}
+@keyframes lgreetIn{0%{opacity:0;transform:translate(-50%,-50%) translateY(18px);filter:blur(8px);}100%{opacity:1;transform:translate(-50%,-50%) translateY(0);filter:blur(0);}}
+@keyframes lgreetOut{0%{opacity:1;transform:translate(-50%,-50%) translateY(0);filter:blur(0);}100%{opacity:0;transform:translate(-50%,-50%) translateY(-18px);filter:blur(8px);}}
+.lg-arabic{font-family:'Noto Naskh Arabic',serif;font-weight:300;font-size:clamp(52px,10vw,96px);color:transparent;background:linear-gradient(135deg,#c8d4e2 0%,#fff 40%,#e8c96a 70%,#ffe066 100%);-webkit-background-clip:text;background-clip:text;letter-spacing:.04em;line-height:1.2;}
+.lg-english{font-family:'Cormorant Garamond',Georgia,serif;font-weight:300;font-size:clamp(52px,10vw,96px);color:transparent;background:linear-gradient(135deg,#c8d4e2 0%,#fff 40%,#e8c96a 70%,#ffe066 100%);-webkit-background-clip:text;background-clip:text;letter-spacing:.28em;}
+#lbrand{position:absolute;bottom:14%;left:50%;transform:translateX(-50%);opacity:0;white-space:nowrap;transition:opacity 1.2s ease;z-index:10;}
+#lbrand.on{opacity:1;}
+#lbrand span{font-family:'Cormorant Garamond',Georgia,serif;font-weight:300;font-size:clamp(14px,2.2vw,22px);letter-spacing:.55em;text-transform:uppercase;color:rgba(201,168,76,.55);}
+#lprogress-wrap{position:absolute;bottom:9%;left:50%;transform:translateX(-50%);width:min(320px,55vw);z-index:10;}
+#lprogress-track{width:100%;height:1px;background:rgba(201,168,76,.12);position:relative;overflow:hidden;}
+#lprogress-bar{position:absolute;top:0;left:0;height:100%;width:0%;background:linear-gradient(90deg,transparent,#c9a84c,#ffe066,#c9a84c,transparent);box-shadow:0 0 12px rgba(201,168,76,.8);transition:width .12s linear;}
+#lprogress-dots{display:flex;justify-content:space-between;margin-top:12px;}
+.lpdot{width:3px;height:3px;border-radius:50%;background:rgba(201,168,76,.2);transition:background .3s ease,box-shadow .3s ease;}
+.lpdot.lit{background:#ffe066;box-shadow:0 0 8px rgba(255,224,102,.8);}
+.lvignette{position:absolute;inset:0;pointer-events:none;z-index:5;background:radial-gradient(ellipse 110% 100% at 50% 50%,transparent 30%,rgba(0,0,0,.92) 100%);}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--gold-dim);border-radius:2px}::-webkit-scrollbar-thumb:hover{background:var(--gold)}
 ::selection{background:var(--gold-dim);color:var(--gold-light)}
 #wa-planet{position:fixed;bottom:32px;right:32px;z-index:1000;width:64px;height:64px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#43e97b,#25D366 50%,#128C7E);box-shadow:0 0 0 0 rgba(37,211,102,0.4),0 0 30px rgba(37,211,102,0.35),0 0 60px rgba(37,211,102,0.15),0 8px 32px rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;text-decoration:none;cursor:none;animation:planet-float 4s ease-in-out infinite,planet-pulse 2.5s ease-in-out infinite;transition:transform 0.4s cubic-bezier(0.16,1,0.3,1),box-shadow 0.4s}
@@ -533,6 +568,38 @@ footer{text-align:center;padding:40px;font-size:12px;color:var(--text-dimmer);le
 }
 </style>
 </head><body>
+<div id="loader">
+  <div id="loader-stars"></div>
+  <div id="loader-solar">
+    <div class="lorb" style="width:600px;height:600px;background:radial-gradient(circle,rgba(201,168,76,.09),transparent 70%);top:50%;left:50%;margin:-300px 0 0 -300px;--spd:22s;--del:0s;--x1:55px;--y1:-70px;--x2:-45px;--y2:50px;--x3:30px;--y3:25px;--blur:80px;"></div>
+    <div class="lorb" style="width:400px;height:400px;background:radial-gradient(circle,rgba(255,209,102,.07),transparent 70%);top:30%;left:55%;margin:-200px 0 0 -200px;--spd:28s;--del:-6s;--x1:-60px;--y1:40px;--x2:50px;--y2:-35px;--x3:-20px;--y3:60px;--blur:90px;"></div>
+    <div class="lorb" style="width:350px;height:350px;background:radial-gradient(circle,rgba(201,168,76,.06),transparent 70%);top:65%;left:38%;margin:-175px 0 0 -175px;--spd:35s;--del:-14s;--x1:35px;--y1:55px;--x2:-55px;--y2:-25px;--x3:45px;--y3:-40px;--blur:70px;"></div>
+    <div class="lorbit-line" style="width:320px;height:320px;--rx:68deg;--rz:15deg;--spd:18s;"></div>
+    <div class="lorbit-line" style="width:480px;height:480px;--rx:74deg;--rz:-20deg;--spd:26s;animation-delay:-5s;"></div>
+    <div class="lorbit-line" style="width:640px;height:640px;--rx:70deg;--rz:35deg;--spd:38s;animation-delay:-12s;"></div>
+    <div class="lorbit-line" style="width:800px;height:800px;--rx:76deg;--rz:-10deg;--spd:52s;animation-delay:-8s;"></div>
+    <div class="lplanet" style="--spd:18s;--sz:6px;--col:#ffe066;--glow:rgba(255,224,102,.8);--rx:160px;--del:0s;"></div>
+    <div class="lplanet" style="--spd:32s;--del:-8s;--sz:5px;--col:#c9a84c;--glow:rgba(201,168,76,.7);--rx:240px;animation-direction:reverse;"></div>
+    <div class="lplanet" style="--spd:52s;--del:-20s;--sz:4px;--col:#e8c96a;--glow:rgba(232,201,106,.6);--rx:320px;"></div>
+    <div class="lplanet" style="--spd:80s;--del:-35s;--sz:3px;--col:#c9a84c;--glow:rgba(201,168,76,.5);--rx:400px;animation-direction:reverse;"></div>
+    <div class="lcore-glow" style="width:280px;height:280px;"></div>
+    <div class="lcore-glow" style="width:160px;height:160px;opacity:.5;animation-delay:.8s"></div>
+  </div>
+  <div id="lgreeting-wrap" style="position:relative;width:500px;height:140px;">
+    <div class="lgreeting lg-arabic" id="lg-ar">مرحباً</div>
+    <div class="lgreeting lg-english" id="lg-en">Hello</div>
+  </div>
+  <div id="lbrand"><span>Synapse.Dev</span></div>
+  <div id="lprogress-wrap">
+    <div id="lprogress-track"><div id="lprogress-bar"></div></div>
+    <div id="lprogress-dots">
+      <div class="lpdot"></div><div class="lpdot"></div><div class="lpdot"></div><div class="lpdot"></div>
+      <div class="lpdot"></div><div class="lpdot"></div><div class="lpdot"></div><div class="lpdot"></div>
+    </div>
+  </div>
+  <div class="lvignette"></div>
+</div>
+
 <div id="cursor"></div>
 <div id="cursor-ring"></div>
 <div class="noise"></div>
@@ -1160,4 +1227,42 @@ window.addEventListener('mousemove',e=>{const x=(e.clientX/window.innerWidth-0.5
 
 </script>
 
+
+<script>
+(function(){
+'use strict';
+var _lac=null;
+function lac(){if(!_lac)_lac=new(window.AudioContext||window.webkitAudioContext)();if(_lac.state==='suspended')_lac.resume();return _lac;}
+var _lcomp=null;
+function lout(){if(!_lcomp){_lcomp=lac().createDynamicsCompressor();_lcomp.threshold.value=-10;_lcomp.ratio.value=8;_lcomp.attack.value=0.003;_lcomp.release.value=0.25;_lcomp.connect(lac().destination);}return _lcomp;}
+function lnoise(dur){var ctx=lac(),n=ctx.sampleRate*dur|0,b=ctx.createBuffer(1,n,ctx.sampleRate),d=b.getChannelData(0);for(var i=0;i<n;i++)d[i]=Math.random()*2-1;return b;}
+function sfxAmbience(){var ctx=lac(),dst=lout(),t=ctx.currentTime;var sub=ctx.createOscillator();sub.type='sine';sub.frequency.setValueAtTime(42,t);sub.frequency.linearRampToValueAtTime(38,t+8);var sg=ctx.createGain();sg.gain.setValueAtTime(0,t);sg.gain.linearRampToValueAtTime(0.08,t+2.5);sg.gain.linearRampToValueAtTime(0,t+8.5);sub.connect(sg);sg.connect(dst);sub.start(t);sub.stop(t+9);[84,126,168,210].forEach(function(f,i){var o=ctx.createOscillator();o.type='sine';o.frequency.value=f;var g=ctx.createGain();g.gain.setValueAtTime(0,t+i*0.4);g.gain.linearRampToValueAtTime([0.028,0.018,0.012,0.006][i],t+i*0.4+1.8);g.gain.linearRampToValueAtTime(0,t+7.5);o.connect(g);g.connect(dst);o.start(t+i*0.4);o.stop(t+8);});var ns=ctx.createBufferSource();ns.buffer=lnoise(8);var lp=ctx.createBiquadFilter();lp.type='lowpass';lp.frequency.setValueAtTime(180,t);lp.frequency.linearRampToValueAtTime(320,t+4);lp.frequency.linearRampToValueAtTime(140,t+8);var ng=ctx.createGain();ng.gain.setValueAtTime(0,t);ng.gain.linearRampToValueAtTime(0.04,t+1.5);ng.gain.linearRampToValueAtTime(0,t+7.8);ns.connect(lp);lp.connect(ng);ng.connect(dst);ns.start(t);ns.stop(t+8.5);}
+function sfxChime(n){var ctx=lac(),dst=lout(),t=ctx.currentTime;[[880,1320],[990,1485]][n%2].forEach(function(f,i){var o=ctx.createOscillator();o.type='sine';o.frequency.value=f;var g=ctx.createGain();g.gain.setValueAtTime(0,t+i*0.04);g.gain.linearRampToValueAtTime(0.055-i*0.018,t+i*0.04+0.01);g.gain.exponentialRampToValueAtTime(0.001,t+i*0.04+0.9);o.connect(g);g.connect(dst);o.start(t+i*0.04);o.stop(t+i*0.04+1.0);});}
+function sfxDone(){var ctx=lac(),dst=lout(),t=ctx.currentTime;[220,277,330,440].forEach(function(f,i){var o=ctx.createOscillator();o.type='sine';o.frequency.value=f;var g=ctx.createGain();g.gain.setValueAtTime(0,t+i*0.06);g.gain.linearRampToValueAtTime(0.045,t+i*0.06+0.15);g.gain.exponentialRampToValueAtTime(0.001,t+i*0.06+2.2);o.connect(g);g.connect(dst);o.start(t+i*0.06);o.stop(t+i*0.06+2.4);});}
+(function(){var c=document.getElementById('loader-stars');for(var i=0;i<180;i++){var s=document.createElement('div');s.className='lstar';var sz=Math.random()*2+0.4;var pal=['#c9a84c','#ffe066','#e8c96a','#d4a843','rgba(255,209,102,0.9)'];s.style.cssText='width:'+sz+'px;height:'+sz+'px;left:'+(Math.random()*100)+'%;top:'+(Math.random()*100)+'%;--op:'+(Math.random()*0.45+0.08)+';--lcol:'+pal[Math.floor(Math.random()*pal.length)]+';--d:'+(3+Math.random()*6)+'s;--del:'+(Math.random()*8)+'s;';c.appendChild(s);}})();
+function setP(p){document.getElementById('lprogress-bar').style.width=p+'%';var dots=document.querySelectorAll('.lpdot');var lit=Math.floor(p/100*dots.length);dots.forEach(function(d,i){i<lit?d.classList.add('lit'):d.classList.remove('lit');});}
+function showG(idx,greets,cb){var el=document.getElementById(greets[idx].id);el.classList.remove('exit');el.classList.add('active');sfxChime(idx);setTimeout(function(){el.classList.remove('active');el.classList.add('exit');setTimeout(function(){el.classList.remove('exit');if(cb)cb();},500);},1100);}
+function runLoader(){
+  sfxAmbience();
+  setTimeout(function(){document.getElementById('lbrand').classList.add('on');},100);
+  var p=0;var pi=setInterval(function(){p+=Math.random()*4+1.5;if(p>=100){p=100;clearInterval(pi);}setP(p);},120);
+  var greets=[{id:'lg-ar'},{id:'lg-en'}];
+  setTimeout(function(){
+    showG(0,greets,function(){
+      setTimeout(function(){
+        showG(1,greets,function(){
+          setTimeout(function(){
+            setP(100);sfxDone();
+            setTimeout(function(){
+              document.getElementById('loader').classList.add('exit');
+            },400);
+          },0);
+        });
+      },200);
+    });
+  },200);
+}
+window.addEventListener('load',function(){setTimeout(runLoader,0);});
+})();
+</script>
 </body></html>
